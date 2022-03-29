@@ -5,31 +5,32 @@
 		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
 		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='responsive.css') }}">
 		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='pygments.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='backgroundcolor.css') }}">
 	</head>
 
 	<body>
-		<div class="navbar navbar-fixed-top">
+		<div class="navbar navbar-fixed-top navbar-dark bg-dark">
 			<div class="navbar-inner">
 				<div class="container">
 					<div class="row">
 						<div class="span12">
 							<a href="#" class="brand">{{ config.TITLE }}</a>
 							<ul class="nav">
-								<li><a href="{{ url_for('wiki.home') }}">Home</a></li>
-								<li><a href="{{ url_for('wiki.index') }}">Index</a></li>
-								<li><a href="{{ url_for('wiki.tags') }}">Tags</a></li>
-								<li><a href="{{ url_for('wiki.search') }}">Search</a></li>
+								<li><a href="{{ url_for('wiki.home') }}"><span style="color: #ff8c00; ">Home</span></a></li>
+								<li><a href="{{ url_for('wiki.index') }}"><span style="color: #ff8c00; ">Index</span></a></li>
+								<li><a href="{{ url_for('wiki.tags') }}"><span style="color: #ff8c00; ">Tags</span></a></li>
+								<li><a href="{{ url_for('wiki.search') }}"><span style="color: #ff8c00; ">Search</span></a></li>
 								<li class="divider-vertical"></li>
-								<li><a href="{{ url_for('wiki.create') }}">New Page</a></li>
+								<li><a href="{{ url_for('wiki.create') }}"><span style="color: #ff8c00; ">New Page</span></a></li>
 								<li class="divider-vertical"></li>
 								<li></li>
 							</ul>
 
 							<ul class="nav pull-right">
 								{% if current_user.is_anonymous %}
-									<li><a href="{{ url_for('wiki.user_login') }}">Login</a></li>
+                                    <li><a href="{{ url_for('wiki.user_login') }}"><span style="color: #ff8c00; ">Login</span></a></li>
 								{% else %}
-									<li><a href="{{ url_for('wiki.user_logout') }}">Logout</a></li>
+                                    <li><a href="{{ url_for('wiki.user_logout') }}"><span style="color: #ff8c00; ">Logout</span></a></li>
 								{% endif %}
 							</ul>
 						</div>

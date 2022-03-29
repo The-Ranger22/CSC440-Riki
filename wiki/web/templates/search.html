@@ -2,9 +2,9 @@
 
 {% block title %}
 {% if search %}
-	Results for "{{ search }}"
+    <span style="color: #ff8c00; ">Results for "{{ search }}"</span>
 {% else %}
-	Search
+    <span style="color: #ff8c00; ">Search</span>
 {% endif %}
 {% endblock title %}
 
@@ -22,13 +22,13 @@
 
 {% if search %}
 	{% if results %}
-		<ul>
+		<ul><span style="color: #ff8c00; ">
 			{% for result in results %}
 				<li><a href="{{ url_for('wiki.display', url=result.url) }}">{{ result.title }}</a></li>
 			{% endfor %}
-		</ul>
+        </span></ul>
 	{% else %}
-		<p>No results for your search.</p>
+        <p><span style="color: #ff8c00; ">No results for your search.</span></p>
 	{% endif %}
 {% endif %}
 {% endblock content %}

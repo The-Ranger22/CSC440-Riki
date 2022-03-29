@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Create a new page{% endblock title %}
+{% block title %}<span style="color: #ff8c00; ">Create a new page</span>
+{% endblock title %}
 {% block content %}
 <form method="POST" class="form-inline">
 	{{ form.hidden_tag() }}
@@ -10,5 +11,5 @@
 {% endblock content %}
 
 {% block sidebar %}
-<p class="alert alert-success">Thank you for creating new content!</p>
+    <p class="alert alert-success"><span style="color: #ff8c00; ">Thank you for creating new content!</span></p>
 {% endblock sidebar %}

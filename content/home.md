@@ -1,5 +1,4 @@
-title: Main
-tags: interesting
+title: Home
+tags: 
 
-World
-[[hello|abc]] [[world|world]]
+abc home home

@@ -1,26 +1,26 @@
 {% extends "base.html" %}
 
-{% block title %}Pages tagged {{ tag }}{% endblock title %}
+{% block title %}<span style="color: #ff8c00; ">Pages tagged {{ tag }}</span>{% endblock title %}
 
 {% block content %}
 {% if pages %}
 	<table class="table">
 		<thead>
 			<tr>
-				<th>Title</th>
-				<th>URL</th>
+                <span style="color: #ff8c00; "><th>Title</th></span>
+                <span style="color: #ff8c00; "><th>URL</th></span>
 			</tr>
 		</thead>
 		<tbody>
 			{% for page in pages %}
-				<tr>
+				<span style="color: #ff8c00; "><tr>
 					<td><a href="{{ url_for('wiki.display', url=page.url) }}">{{ page.title }}</a></td>
 					<td><a href="{{ url_for('wiki.display', url=page.url) }}">{{ page.url }}</a></td>
-				</tr>
+                </tr></span>
 			{% endfor %}
 		</tbody>
 	</table>
 {% else %}
-	<p>There are no pages tagged {{ tag }}.</p>
+    <p><span style="color: #ff8c00; ">There are no pages tagged {{ tag }}.</span></p>
 {% endif %}
 {% endblock content %}

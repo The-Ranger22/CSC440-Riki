@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title -%}
-	Wiki page not found!
+    <span style="color: #ff8c00; ">Wiki page not found!</span>
 {% endblock title %}
 
 {% block content %}
-<p>You did not create any content for this page yet.</p>
-<p><a href="{{ url_for('wiki.edit', url=request.path.strip("/")) }}" class="btn btn-success">Create a new page</a></p>
+    <p><span style="color: #ff8c00; ">You did not create any content for this page yet.</span></p>
+    <p><a href="{{ url_for('wiki.edit', url=request.path.strip("/")) }}" class="btn btn-success"><span style="color: #ff8c00; ">Create a new page</span></a></p>
 {% endblock %}
