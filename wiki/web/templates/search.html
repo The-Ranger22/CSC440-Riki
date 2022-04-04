@@ -24,7 +24,7 @@
 	{% if results %}
 		<ul><span style="color: #ff8c00; ">
 			{% for result in results %}
-				<li><a href="{{ url_for('wiki.display', url=result.url) }}">{{ result.title }}</a></li>
+                <li><a href="{{ url_for('wiki.display', url=result.url) }}"><span style="color: #ff8c00; ">{{ result.title }}</span></a></li>
 			{% endfor %}
         </span></ul>
 	{% else %}

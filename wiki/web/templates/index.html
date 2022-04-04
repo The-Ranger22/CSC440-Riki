@@ -6,12 +6,12 @@
 {% if pages %}
 	<table class="table">
 		<thead>
-			<tr>
+			<tr class = "backgroundText">
                 <th><span style="color: #ff8c00; ">Title</span></th>
                 <th><span style="color: #ff8c00; ">URL</span></th>
 			</tr>
 		</thead>
-		<tbody>
+		<tbody class = "backgroundText">
 			{% for page in pages %}
 				<tr>
                     <td><a href="{{ url_for('wiki.display', url=page.url) }}"><span style="color: #ff8c00; ">{{ page.title }}</span></a></td>
@@ -21,7 +21,7 @@
 		</tbody>
 	</table>
 {% else %}
-    <p><span style="color: #ff8c00; ">There are no pages yet.</span></p>
+    <p class = "backgroundText"><span style="color: #ff8c00; ">There are no pages yet.</span></p>
 {% endif %}
 {% endblock content %}
 

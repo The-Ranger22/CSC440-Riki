@@ -194,6 +194,9 @@ a:hover {
   min-height: 1px;
   margin-left: 20px;
 }
+.bg_dark {
+  color: grey;
+}
 .container,
 .navbar-static-top .container,
 .navbar-fixed-top .container,
@@ -2282,7 +2285,7 @@ table [class*=span],
   padding: 5px 0;
   margin: 2px 0 0;
   list-style: none;
-  background-color: #ffffff;
+  background-color: grey;
   border: 1px solid #ccc;
   border: 1px solid rgba(0, 0, 0, 0.2);
   *border-right-width: 2px;
