@@ -22,7 +22,6 @@ from wiki.web import current_wiki
 from wiki.web import current_users
 from wiki.web.user import protect
 
-
 bp = Blueprint('wiki', __name__)
 
 
@@ -104,18 +103,26 @@ def delete(url):
     return redirect(url_for('wiki.home'))
 
 
+# Replaced by categories page
 @bp.route('/tags/')
 @protect
 def tags():
     tags = current_wiki.get_tags()
     return render_template('tags.html', tags=tags)
 
-
 @bp.route('/tag/<string:name>/')
 @protect
 def tag(name):
     tagged = current_wiki.index_by_tag(name)
     return render_template('tag.html', pages=tagged, tag=name)
+
+
+@bp.route('/categories/')
+@protect
+def categories():
+    tags = current_wiki.get_tags()
+    pages = current_wiki.index()
+    return render_template('categories.html', pages=pages, tags=tags)
 
 
 @bp.route('/search/', methods=['GET', 'POST'])
@@ -179,4 +186,3 @@ def user_delete(user_id):
 @bp.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
-
