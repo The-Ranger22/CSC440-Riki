@@ -5,8 +5,9 @@ from os.path import exists
 
 db_name = 'wiki'
 file_ext = ".db"
-db_file = getcwd() + "/" + db_name + file_ext
 
+def db_file_path():
+    return getcwd() + "/" + db_name + file_ext
 
 def setup():
     loc = __path__[0]
@@ -18,11 +19,10 @@ def setup():
             raise TypeError
         print("Creating DB...")
         conn.executescript(query)
-        conn.commit()
 
 
 if __name__ == "__main__":
-    if not exists(db_file):
+    if not exists(db_file_path()):
         setup()
 
 
