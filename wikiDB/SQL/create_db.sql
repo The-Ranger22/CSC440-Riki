@@ -1,3 +1,6 @@
+PRAGMA foreign_keys = ON;
+
+
 CREATE TABLE USER (
     ID              INTEGER     UNIQUE          PRIMARY KEY     AUTOINCREMENT   NOT NULL,
     USERNAME        TEXT                                                        NOT NULL,
@@ -16,7 +19,10 @@ CREATE TABLE PAGE (
 );
 CREATE TABLE TAG (
     ID              INTEGER     UNIQUE          PRIMARY KEY     AUTOINCREMENT   NOT NULL,
-    NAME            TEXT                                                        NOT NULL
+    NAME            TEXT                                                        NOT NULL,
+    CATEGORY_ID     INTEGER                                                     NOT NULL,
+    CONSTRAINT FK_CATEGORY_ID FOREIGN KEY (CATEGORY_ID)   REFERENCES CATEGORY(ID)
+
 );
 CREATE TABLE CATEGORY (
     ID              INTEGER     UNIQUE          PRIMARY KEY     AUTOINCREMENT   NOT NULL,
@@ -26,7 +32,10 @@ CREATE TABLE CATEGORY (
 CREATE TABLE PAGE_TAGS (
     PAGE_ID         INTEGER,
     TAG_ID          INTEGER,
-    FOREIGN KEY (PAGE_ID)   REFERENCES PAGE(ID),
-    FOREIGN KEY (TAG_ID)    REFERENCES PAGE(ID)
+    CONSTRAINT FK_PAGE_ID FOREIGN KEY (PAGE_ID)   REFERENCES PAGE(ID),
+    CONSTRAINT FK_TAG_ID  FOREIGN KEY (TAG_ID)    REFERENCES PAGE(ID)
 );
 --
+-- Setting up the first category
+INSERT INTO CATEGORY (NAME) VALUES ('UNCATEGORIZED');
+
