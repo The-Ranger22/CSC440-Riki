@@ -1,10 +1,9 @@
 {% extends "base.html" %}
-
 {% block title %}
 {% if search %}
-    <span style="color: #ff8c00; ">Results for "{{ search }}"</span>
+	Results for "{{ search }}"
 {% else %}
-    <span style="color: #ff8c00; ">Search</span>
+	Search
 {% endif %}
 {% endblock title %}
 
@@ -15,20 +14,27 @@
 			{{ form.hidden_tag() }}
 			{{ form.term(placeholder='Search for.. (regex accepted)', autocomplete="off") }}
             {{ form.ignore_case() }} Ignore Case
-			<input type="submit" class="btn btn-success pull-right" value="Search!">
+            <input type="submit" class="btn btn-success pull-right" value="Search!">
+            <div class="pull-right">
+                Sort By: {{ form.option }}
+            </div>
 		</form>
 	</div>
-</div>
 
+</div>
 {% if search %}
-	{% if results %}
-		<ul><span style="color: #ff8c00; ">
-			{% for result in results %}
-                <li><a href="{{ url_for('wiki.display', url=result.url) }}"><span style="color: #ff8c00; ">{{ result.title }}</span></a></li>
-			{% endfor %}
-        </span></ul>
-	{% else %}
-        <p><span style="color: #ff8c00; ">No results for your search.</span></p>
-	{% endif %}
+    {% for result in results %}
+        <div class="row">
+            <div class="offset1 span8">
+                <dl>
+                    <dt>
+                        <a href="{{ url_for('wiki.display', url=result.url) }}">{{ result.title }}</a>
+                        <div class="pull-right">{{ result.date_created }}</div>
+                    </dt>
+                </dl>
+            </div>
+        </div>
+        <p><br></p>
+    {% endfor %}
 {% endif %}
 {% endblock content %}

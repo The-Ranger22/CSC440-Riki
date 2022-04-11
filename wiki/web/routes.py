@@ -21,6 +21,7 @@ from wiki.web.forms import URLForm
 from wiki.web import current_wiki
 from wiki.web import current_users
 from wiki.web.user import protect
+from wikiDB.DatabaseModel import Page
 
 bp = Blueprint('wiki', __name__)
 
@@ -110,6 +111,7 @@ def tags():
     tags = current_wiki.get_tags()
     return render_template('tags.html', tags=tags)
 
+
 @bp.route('/tag/<string:name>/')
 @protect
 def tag(name):
@@ -130,9 +132,46 @@ def categories():
 def search():
     form = SearchForm()
     if form.validate_on_submit():
-        results = current_wiki.search(form.term.data, form.ignore_case.data)
-        return render_template('search.html', form=form,
-                               results=results, search=form.term.data)
+        searchText = form.term.data
+        caseInsensitive = form.ignore_case.data
+        option = form.option.data
+
+        term = "%"
+        if searchText[0] == "\"" and searchText[len(searchText) - 1] == "\"":
+            searchText = searchText[1:-1]
+            term = "%{}%".format(searchText)
+        else:
+            terms = searchText.split()
+            for t in terms:
+                term = term + t + '%'
+        searchTerm = term.encode()
+
+        results = None
+
+        if not caseInsensitive:
+            results = query_for_search(option, searchTerm)
+
+            words = term[1:-1].split('%')
+            idList = []
+            for result in results:
+                if all((word.encode() in result.content for word in words) or (word.encode() in result.title
+                       for word in words)):
+                    idList.append(result.id)
+            if option == "default":
+                results = Page.query.filter(Page.id.in_(idList)).all()
+            elif option == "CDO":
+                results = Page.query.filter(Page.id.in_(idList)).order_by(Page.date_created).all()
+            elif option == "CDN":
+                results = Page.query.filter(Page.id.in_(idList)).order_by(Page.date_created.desc()).all()
+            elif option == "EDO":
+                results = Page.query.filter(Page.id.in_(idList)).order_by(Page.last_edited).all()
+            elif option == "EDN":
+                results = Page.query.filter(Page.id.in_(idList)).order_by(Page.last_edited.desc()).all()
+        else:
+            results = query_for_search(option, searchTerm)
+
+        return render_template('search.html', form=form, results=results, search=form.term.data,
+                               case=form.ignore_case.data)
     return render_template('search.html', form=form, search=None)
 
 
@@ -186,3 +225,22 @@ def user_delete(user_id):
 @bp.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
+
+
+def query_for_search(option, search_term):
+    results = None
+    if option == "default":
+        results = Page.query.filter(Page.content.like(search_term) | Page.title.like(search_term)).all()
+    elif option == "CDO":
+        results = Page.query.filter(Page.content.like(search_term) | Page.title.like(search_term)) \
+            .order_by(Page.date_created).all()
+    elif option == "CDN":
+        results = Page.query.filter(Page.content.like(search_term) | Page.title.like(search_term)) \
+            .order_by(Page.date_created.desc()).all()
+    elif option == "EDO":
+        results = Page.query.filter(Page.content.like(search_term) | Page.title.like(search_term)) \
+            .order_by(Page.last_edited).all()
+    elif option == "EDN":
+        results = Page.query.filter(Page.content.like(search_term) | Page.title.like(search_term)) \
+            .order_by(Page.last_edited.desc()).all()
+    return results

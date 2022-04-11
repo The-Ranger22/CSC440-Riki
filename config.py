@@ -8,3 +8,4 @@ CONTENT_DIR = f'{getcwd()}/content'
 USER_DIR = f'{getcwd()}/user'
 NUMBER_OF_HISTORY = 5
 PRIVATE = True
+

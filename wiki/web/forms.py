@@ -7,6 +7,7 @@ from wtforms import BooleanField
 from wtforms import TextField
 from wtforms import TextAreaField
 from wtforms import PasswordField
+from wtforms import SelectField
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
 
@@ -32,6 +33,10 @@ class SearchForm(Form):
         description='Ignore Case',
         # FIXME: default is not correctly populated
         default=True)
+    option = SelectField("Sort By", choices=[("default", "Relevance"), ("CDO", "Creation Date: Oldest"),
+                                             ("CDN", "Creation Date: Newest"), ("EDO", "Last Edited Date: Oldest"),
+                                             ("EDN", "Last Edited Date: Newest")], render_kw={'style': 'width: 15ch'},)
+
 
 
 class EditorForm(Form):
