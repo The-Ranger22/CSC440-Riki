@@ -2,6 +2,8 @@
     Forms
     ~~~~~
 """
+import logging
+
 from flask_wtf import Form
 from wtforms import BooleanField
 from wtforms import TextField
@@ -14,13 +16,14 @@ from wtforms.validators import ValidationError
 from wiki.core import clean_url
 from wiki.web import current_wiki
 from wiki.web import current_users
-
+log = logging.getLogger('wiki')
 
 class URLForm(Form):
     url = TextField('', [InputRequired()])
 
     def validate_url(form, field):
         if current_wiki.exists(field.data):
+            log.debug(f'The URL {field.data} exists already.')
             raise ValidationError('The URL "%s" exists already.' % field.data)
 
     def clean_url(self, url):
@@ -51,12 +54,20 @@ class LoginForm(Form):
 
     def validate_name(form, field):
         user = current_users.get_user(field.data)
+
         if not user:
+            log.debug(f'Cannot find username: \'{field.data}\'')
             raise ValidationError('This username does not exist.')
+        else:
+            log.debug(f'Validated user: \'{user.get_id()}\'')
+
 
     def validate_password(form, field):
         user = current_users.get_user(form.name.data)
         if not user:
             return
         if not user.check_password(field.data):
+            log.debug(f'Username and password do not match. User: \'{user.get_id()}\'')
             raise ValidationError('Username and password do not match.')
+        else:
+            log.info(f'User \'{user.get_id()}\' has logged on.')

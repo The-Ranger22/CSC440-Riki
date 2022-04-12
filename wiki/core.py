@@ -5,6 +5,7 @@
     Responsible for presenting information to the user
 
 """
+import logging
 from collections import OrderedDict
 from io import open
 import os
@@ -13,7 +14,7 @@ import re
 from flask import abort
 from flask import url_for
 import markdown
-
+log = logging.getLogger('wiki')
 
 def clean_url(url):
     """
@@ -28,9 +29,11 @@ def clean_url(url):
         :returns: the cleaned url
         :rtype: str
     """
+    log.debug(f'Dirty url: \'{url}\'')
     url = re.sub('[ ]{2,}', ' ', url).strip()
     url = url.lower().replace(' ', '_')
     url = url.replace('\\\\', '/').replace('\\', '/')
+    log.debug(f'Clean url: \'{url}\'')
     return url
 
 
@@ -53,6 +56,7 @@ def wikilink(text, url_formatter=None):
         :returns: the processed html
         :rtype: str
     """
+    log.debug(f'Preformatted wiki-link: \'{text}\'')
     if url_formatter is None:
         url_formatter = url_for
     link_regex = re.compile(
@@ -67,6 +71,8 @@ def wikilink(text, url_formatter=None):
             title
         )
         text = re.sub(link_regex, html_url, text, count=1)
+
+    log.debug(f'Formatted wiki-link: \'{text}\'')
     return text
 
 
@@ -194,6 +200,7 @@ class Page(object):
         with open(self.path, 'w', encoding='utf-8') as f:
             for key, value in list(self._meta.items()):
                 line = '%s: %s\n' % (key, value)
+                log.debug(f'line: \'{line}\'')
                 f.write(line)
             f.write('\n')
             f.write(self.body.replace('\r\n', '\n'))

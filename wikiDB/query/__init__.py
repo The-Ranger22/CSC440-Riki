@@ -1,10 +1,13 @@
 
 # region Imports
+import logging
+
 import wikiDB
 from sqlite3 import connect
 from sqlite3 import DatabaseError
 from abc import ABC, abstractmethod
 # endregion
+log = logging.getLogger('database')
 
 def _query(method):
     """
@@ -22,10 +25,12 @@ def _query(method):
         try:
             conn = connect(wikiDB.db_file_path())
             cursor = conn.cursor()
+            log.debug(f'Attempting query: {method(ref)}')
             cursor.execute(method(ref)) # TODO: Start enforcing the relational constrains of foreign keys
             result = cursor.fetchall()
             conn.commit()
             conn.close()
+
             return result
         except Exception:
             raise DatabaseError
@@ -65,13 +70,14 @@ class AbstractTable(ABC):
 
 
             if query_type not in self.query_types:
+                log.error()
                 raise ValueError("argument <query_type> must be an element of ['INSERT','SELECT','UPDATE','DELETE']")
 
             self._clauses = []
             query_cmd = ""
             if query_type == "INSERT":
-                # if no arguments have been provided to populate the argument fields, raise a value error
                 if len(kwargs) == 0:
+                    log.debug("'No fields for the INSERT statement were provided'")
                     raise ValueError
                 seperator = ", "
                 query_cmd = f"INSERT INTO {table} ({seperator.join(kwargs.keys())}) VALUES ({seperator.join(kwargs.values())})"
@@ -89,6 +95,7 @@ class AbstractTable(ABC):
 
         def where(self, **kwargs):
             if len(kwargs) == 0:
+                log.debug("'No conditions for the WHERE statement were provided'")
                 raise ValueError("No conditions for the WHERE statement were provided")
             separator = " AND "
             kwargs = _kwargs_sq_processor(kwargs)

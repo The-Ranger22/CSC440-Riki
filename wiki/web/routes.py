@@ -2,7 +2,9 @@
     Routes
     ~~~~~~
 """
-from flask import Blueprint
+import logging
+
+from flask import Blueprint, current_app
 from flask import flash
 from flask import redirect
 from flask import render_template
@@ -22,8 +24,9 @@ from wiki.web import current_wiki
 from wiki.web import current_users
 from wiki.web.user import protect
 from wikiDB.DatabaseModel import Page
-
+log = logging.getLogger('wiki')
 bp = Blueprint('wiki', __name__)
+
 
 
 @bp.route('/')
@@ -133,6 +136,7 @@ def search():
     form = SearchForm()
     if form.validate_on_submit():
         searchText = form.term.data
+        log.debug(f'Raw search text: \'{searchText}\'')
         caseInsensitive = form.ignore_case.data
         option = form.option.data
 
@@ -145,7 +149,7 @@ def search():
             for t in terms:
                 term = term + t + '%'
         searchTerm = term.encode()
-
+        log.debug(f'Processed search text: \'{searchTerm}\'')
         results = None
 
         if not caseInsensitive:
@@ -228,6 +232,7 @@ def page_not_found(error):
 
 
 def query_for_search(option, search_term):
+    log.info(f'Searching for pages with criteria: \'{search_term}\', option: \'{option}\'')
     results = None
     if option == "default":
         results = Page.query.filter(Page.content.like(search_term) | Page.title.like(search_term)).all()

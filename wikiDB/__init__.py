@@ -1,8 +1,9 @@
+import logging
 from sqlite3 import connect, Connection
 from os import getcwd
 from os.path import exists
 
-
+log = logging.getLogger('database')
 db_name = 'wiki'
 file_ext = ".db"
 
@@ -11,14 +12,16 @@ def db_file_path():
 
 def setup():
     loc = __path__[0]
-    print("Beginning setup process...")
+    log.info("beginning db setup.")
     with open(f"{loc}/SQL/create_db.sql", "r") as file:
         query = file.read()
     with connect(db_name + file_ext) as conn:
         if not isinstance(conn, Connection):
+            log.critical("Unable to setup DB. ")
             raise TypeError
-        print("Creating DB...")
+        log.info("Creating DB...")
         conn.executescript(query)
+    log.info("Db created.")
 
 
 if __name__ == "__main__":
