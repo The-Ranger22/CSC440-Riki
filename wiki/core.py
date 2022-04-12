@@ -270,6 +270,7 @@ class Wiki(object):
         page = self.get(url)
         if page:
             return page
+        log.error(f'Unable to find resource: \'{url}\'')
         abort(404)
 
     def get_bare(self, url):
@@ -290,6 +291,7 @@ class Wiki(object):
         # otherwise there are probably some '..' links in target path leading
         # us outside defined root directory
         if len(common) < len(root):
+            log.critical(f'Possible write attempt outside content directory: \'{newurl}\'')
             raise RuntimeError(
                 'Possible write attempt outside content directory: '
                 '%s' % newurl)

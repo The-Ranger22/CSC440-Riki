@@ -53,7 +53,7 @@ class LoginForm(Form):
     password = PasswordField('', [InputRequired()])
 
     def validate_name(form, field):
-        user = current_users.get_user(field.data)
+        user = current_users.get_user(field.data.strip())
 
         if not user:
             log.debug(f'Cannot find username: \'{field.data}\'')
