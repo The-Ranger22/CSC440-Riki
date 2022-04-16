@@ -116,8 +116,6 @@ class AbstractTable(ABC):
 
         @_query
         def exec(self):
-            print(self._clauses)
-            print(self._args)
             return (f"{' '.join(self._clauses)};", self._args)
 
     @classmethod

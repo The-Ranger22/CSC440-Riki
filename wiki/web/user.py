@@ -11,64 +11,95 @@ from functools import wraps
 from flask import current_app
 from flask_login import current_user
 
+from wikiDB.query import UserTable
 
 
 class UserManager(object):
     """A very simple user Manager, that saves it's data as json."""
-    def __init__(self, path):
-        self.file = os.path.join(path, 'users.json')
+
+    def __init__(self):
+        pass
+
+
+    @staticmethod
+    def _form_userdata_from_query(password, auth):
+        return {
+                    'active': True,
+                    'authentication_method': 'cleartext',
+                    'password': password,
+                    'authenticated': auth,
+                    'roles': []
+                }
 
     def read(self):
-        if not os.path.exists(self.file):
-            return {}
-        with open(self.file) as f:
-            data = json.loads(f.read())
+        # with open(self.file) as f:
+        #     data = json.loads(f.read())
+
+        raw_query_data = UserTable.select().exec()
+        data = {}
+
+        # Convert query data to the expected dictionary format
+        for uid, username, password, email, authenticated, active in raw_query_data:
+            data[username] = {
+                'active': active,
+                'authentication_method': 'cleartext',
+                'password': password,
+                'authenticated': authenticated,
+                'roles': []
+            }
+
         return data
 
     def write(self, data):
-        with open(self.file, 'w') as f:
-            f.write(json.dumps(data, indent=2))
+        pass
+        # with open(self.file, 'w') as f:
+        #     f.write(json.dumps(data, indent=2))
 
     def add_user(self, name, password,
                  active=True, roles=[], authentication_method=None):
-        users = self.read()
-        if users.get(name):
+
+        if len(UserTable.select().where(username=name)) > 0:
             return False
         if authentication_method is None:
             authentication_method = get_default_authentication_method()
-        new_user = {
-            'active': active,
-            'roles': roles,
-            'authentication_method': authentication_method,
-            'authenticated': False
-        }
+
+        # new_user = {
+        #     'active': active,
+        #     'roles': roles,
+        #     'authentication_method': authentication_method,
+        #     'authenticated': False
+        # }
         # Currently we have only two authentication_methods: cleartext and
         # hash. If we get more authentication_methods, we will need to go to a
         # strategy object pattern that operates on User.data.
-        if authentication_method == 'hash':
-            new_user['hash'] = make_salted_hash(password)
-        elif authentication_method == 'cleartext':
-            new_user['password'] = password
-        else:
-            raise NotImplementedError(authentication_method)
-        users[name] = new_user
-        self.write(users)
-        userdata = users.get(name)
-        return User(self, name, userdata)
+        # if authentication_method == 'hash':
+        #     new_user['hash'] = make_salted_hash(password)
+        # elif authentication_method == 'cleartext':
+        #     new_user['password'] = password
+        # else:
+        #     raise NotImplementedError(authentication_method)
+        # self.write(users)
+
+        UserTable.insert(name, password, "mail@mail.com", True, True)
+        return User(self, name, self._form_userdata_from_query(password, True))
 
     def get_user(self, name):
-        users = self.read()
-        userdata = users.get(name)
-        if not userdata:
+
+        # users = self.read()
+
+        userdata = (UserTable.select().where(username=name).exec())
+        userdata = userdata[0]
+        if len(userdata) == 0:
             return None
-        return User(self, name, userdata)
+        return User(self, name, self._form_userdata_from_query(userdata[2], userdata[4]))
 
     def delete_user(self, name):
-        users = self.read()
-        if not users.pop(name, False):
-            return False
-        self.write(users)
-        return True
+        raise NotImplementedError()
+        # users = self.read()
+        # if not users.pop(name, False):
+        #     return False
+        # self.write(users)
+        # return True
 
     def update(self, name, userdata):
         data = self.read()
@@ -145,4 +176,5 @@ def protect(f):
         if current_app.config.get('PRIVATE') and not current_user.is_authenticated:
             return current_app.login_manager.unauthorized()
         return f(*args, **kwargs)
+
     return wrapper
