@@ -29,7 +29,7 @@ def _query(method):
             query_format, arguments = method(ref)
 
             log.debug(f'Attempting query: {query_format}')
-
+            cursor.execute("PRAGMA foreign_keys = ON;")
             cursor.execute(query_format, arguments)  # TODO: Start enforcing the relational constrains of foreign keys
             result = cursor.fetchall()
             conn.commit()
