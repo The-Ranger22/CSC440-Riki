@@ -25,8 +25,12 @@ def _query(method):
         try:
             conn = connect(wikiDB.db_file_path())
             cursor = conn.cursor()
-            log.debug(f'Attempting query: {method(ref)}')
-            cursor.execute(method(ref)) # TODO: Start enforcing the relational constrains of foreign keys
+
+            query_format, arguments = method(ref)
+
+            log.debug(f'Attempting query: {query_format}')
+
+            cursor.execute(query_format, arguments)  # TODO: Start enforcing the relational constrains of foreign keys
             result = cursor.fetchall()
             conn.commit()
             conn.close()
@@ -66,7 +70,7 @@ class AbstractTable(ABC):
                 raise TypeError
 
             query_type = query_type.upper()
-            kwargs = _kwargs_sq_processor(kwargs)  # Applying single quotes to all values of type str
+            # kwargs = _kwargs_sq_processor(kwargs)  # Applying single quotes to all values of type str
 
 
             if query_type not in self.query_types:
@@ -74,13 +78,16 @@ class AbstractTable(ABC):
                 raise ValueError("argument <query_type> must be an element of ['INSERT','SELECT','UPDATE','DELETE']")
 
             self._clauses = []
+            self._args = []
             query_cmd = ""
             if query_type == "INSERT":
                 if len(kwargs) == 0:
                     log.debug("'No fields for the INSERT statement were provided'")
                     raise ValueError
                 seperator = ", "
-                query_cmd = f"INSERT INTO {table} ({seperator.join(kwargs.keys())}) VALUES ({seperator.join(kwargs.values())})"
+                # query_cmd = f"INSERT INTO {table} ({seperator.join(kwargs.keys())}) VALUES ({seperator.join(kwargs.values())})"
+                query_cmd = f"INSERT INTO {table} ({seperator.join(kwargs.keys())}) VALUES ({seperator.join(['?' for x in range(len(kwargs.values()))])})"
+                self._args = list(kwargs.values())
             elif query_type == "SELECT":
                 if len(args) == 0:
                     query_cmd = f"SELECT * FROM {table}"
@@ -109,7 +116,9 @@ class AbstractTable(ABC):
 
         @_query
         def exec(self):
-            return f"{' '.join(self._clauses)};"
+            print(self._clauses)
+            print(self._args)
+            return (f"{' '.join(self._clauses)};", self._args)
 
     @classmethod
     @abstractmethod

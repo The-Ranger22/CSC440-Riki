@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="wiki" uuid="5b5a6dcc-7ff1-45d3-b748-ccf7e4e48fce">
+    <data-source source="LOCAL" name="wiki" uuid="d80d66f0-2bc4-4260-8f94-322b40a596ab">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/wiki.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:C:\Users\Galactica\PycharmProjects\CSC440-Riki\wiki.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
       <libraries>
         <library>
