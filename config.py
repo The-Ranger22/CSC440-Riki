@@ -56,7 +56,7 @@ LOGGING_CONFIG = {
     'loggers': {
         '': {  # root logger
             'handlers': ['external_rotating_file_handler'],
-            'level': LOG_LEVEL,
+            'level': 'DEBUG',
             'propagate': False
         },
         'wiki': {

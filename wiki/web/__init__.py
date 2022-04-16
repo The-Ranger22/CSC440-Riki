@@ -1,3 +1,4 @@
+import logging
 import os
 
 from flask import current_app
@@ -8,6 +9,7 @@ from werkzeug.local import LocalProxy
 
 from wiki.core import Wiki
 from wiki.web.user import UserManager
+log = logging.getLogger('wiki')
 
 class WikiError(Exception):
     pass

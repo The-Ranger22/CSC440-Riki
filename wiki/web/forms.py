@@ -23,8 +23,9 @@ class URLForm(Form):
 
     def validate_url(form, field):
         if current_wiki.exists(field.data):
-            log.debug(f'The URL {field.data} exists already.')
-            raise ValidationError('The URL "%s" exists already.' % field.data)
+            error_msg = f'The URL \'{field.data}\' exists already.'
+            log.debug(error_msg)
+            raise ValidationError(error_msg)
 
     def clean_url(self, url):
         return clean_url(url)

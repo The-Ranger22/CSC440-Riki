@@ -73,6 +73,7 @@ def edit(url):
         form.populate_obj(page)
         page.save()
         flash('"%s" was saved.' % page.title, 'success')
+        log.info(f'Successfully saved page \'{page.title}\'')
         return redirect(url_for('wiki.display', url=url))
     return render_template('editor.html', form=form, page=page)
 
@@ -104,6 +105,7 @@ def delete(url):
     page = current_wiki.get_or_404(url)
     current_wiki.delete(url)
     flash('Page "%s" was deleted.' % page.title, 'success')
+    log.info(f'Page \'{page.title}\' was successfully deleted')
     return redirect(url_for('wiki.home'))
 
 
