@@ -88,9 +88,11 @@ class UserManager(object):
         # users = self.read()
 
         userdata = (UserTable.select().where(username=name).exec())
-        userdata = userdata[0]
         if len(userdata) == 0:
-            return None
+            return False
+        userdata = userdata[0]
+
+
         return User(self, name, self._form_userdata_from_query(userdata[2], userdata[4]))
 
     def delete_user(self, name):
