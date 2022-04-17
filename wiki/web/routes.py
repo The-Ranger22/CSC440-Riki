@@ -32,7 +32,7 @@ bp = Blueprint('wiki', __name__)
 @bp.route('/')
 @protect
 def home():
-    page = current_wiki.get('home')
+    page = current_wiki.get_from_DB('home')
     if page:
         return display('home')
     return render_template('home.html')
@@ -48,7 +48,7 @@ def index():
 @bp.route('/<path:url>/')
 @protect
 def display(url):
-    page = current_wiki.get_or_404(url)
+    page = current_wiki.get_from_DB(url)
     return render_template('page.html', page=page)
 
 

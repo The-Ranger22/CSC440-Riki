@@ -100,11 +100,11 @@ class AbstractTable(ABC):
 
             self._clauses.append(query_cmd)
 
-        def where(self, **kwargs):
+        def where(self, separator, **kwargs):
             if len(kwargs) == 0:
                 log.debug("'No conditions for the WHERE statement were provided'")
                 raise ValueError("No conditions for the WHERE statement were provided")
-            separator = " AND "
+            separator = " %s " % separator
             kwargs = _kwargs_sq_processor(kwargs)
             self._clauses.append(f"WHERE {separator.join([f'{key}={value}' for key, value in kwargs.items()])}")
             return self
