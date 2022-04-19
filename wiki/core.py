@@ -5,6 +5,7 @@
     Responsible for presenting information to the user
 
 """
+import json
 import logging
 from collections import OrderedDict
 from io import open
@@ -14,7 +15,10 @@ import re
 from flask import abort
 from flask import url_for
 import markdown
-log = logging.getLogger('wiki')
+import datetime
+from wikiDB.query import PageTable
+log_wiki = logging.getLogger('wiki')
+log_db = logging.getLogger('database')
 
 def clean_url(url):
     """
@@ -29,11 +33,11 @@ def clean_url(url):
         :returns: the cleaned url
         :rtype: str
     """
-    log.debug(f'Dirty url: \'{url}\'')
+    log_wiki.debug(f'Dirty url: \'{url}\'')
     url = re.sub('[ ]{2,}', ' ', url).strip()
     url = url.lower().replace(' ', '_')
     url = url.replace('\\\\', '/').replace('\\', '/')
-    log.debug(f'Clean url: \'{url}\'')
+    log_wiki.debug(f'Clean url: \'{url}\'')
     return url
 
 
@@ -56,7 +60,7 @@ def wikilink(text, url_formatter=None):
         :returns: the processed html
         :rtype: str
     """
-    log.debug(f'Preformatted wiki-link: \'{text}\'')
+    log_wiki.debug(f'Preformatted wiki-link: \'{text}\'')
     if url_formatter is None:
         url_formatter = url_for
     link_regex = re.compile(
@@ -72,7 +76,7 @@ def wikilink(text, url_formatter=None):
         )
         text = re.sub(link_regex, html_url, text, count=1)
 
-    log.debug(f'Formatted wiki-link: \'{text}\'')
+    log_wiki.debug(f'Formatted wiki-link: \'{text}\'')
     return text
 
 
@@ -174,12 +178,17 @@ class Processor(object):
 
 
 class Page(object):
-    def __init__(self, path, url, new=False):
-        self.path = path
+
+    def __init__(self, id, url, title, content, date_created, last_edited, new=False):
+        self.id = id
         self.url = url
+        self.notTheOtherTitle = title
+        self.content = content
+        self.date_created = date_created
+        self.last_edited = last_edited
         self._meta = OrderedDict()
         if not new:
-            self.load()
+            #self.load()
             self.render()
 
     def __repr__(self):
@@ -194,18 +203,15 @@ class Page(object):
         self._html, self.body, self._meta = processor.process()
 
     def save(self, update=True):
-        folder = os.path.dirname(self.path)
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-        with open(self.path, 'w', encoding='utf-8') as f:
-            for key, value in list(self._meta.items()):
-                line = '%s: %s\n' % (key, value)
-                log.debug(f'line: \'{line}\'')
-                f.write(line)
-            f.write('\n')
-            f.write(self.body.replace('\r\n', '\n'))
+        now = datetime.datetime.now()
+        lines = []
+        for key, value in list(self._meta.items()):
+            line = '%s: %s\n' % (key, value)
+            lines.append(line)
+            log_wiki.debug(f'line: \'{line}\'')
+        self.content = "\n".join(lines)
+        PageTable.insert(self.url, self.title, self.content, now, now).exec()
         if update:
-            self.load()
             self.render()
 
     @property
@@ -252,12 +258,31 @@ class Wiki(object):
     def __init__(self, root):
         self.root = root
 
+    def get_from_DB(self, url):
+        result_list = PageTable.select().where('OR',URI=url,title=url).exec()
+        if len(result_list) == 0:
+            log_db.error(f'Unable to find page with url/title: \'{url}\'')
+            abort(404)
+        elif len(result_list) > 1:
+            log_db.error(f'Result set > 1 when querying PAGE with url: \'{url}\'')
+            abort(500, 'Internal Server Error')
+        else:
+            result = result_list[0]
+            id = result[0]
+            uri = result[1]
+            title = result[2]
+            content = result[3]
+            date_created = result[4]
+            last_edited = result[5]
+            return Page(id, uri, title, content, date_created, last_edited)
+
     def path(self, url):
         return os.path.join(self.root, url + '.md')
 
     def exists(self, url):
-        path = self.path(url)
-        return os.path.exists(path)
+        result_list = PageTable.select().where('OR',URI=url,title=url).exec()
+        return len(result_list) > 0
+
 
     def get(self, url):
         path = self.path(url)
@@ -266,18 +291,19 @@ class Wiki(object):
             return Page(path, url)
         return None
 
-    def get_or_404(self, url):
-        page = self.get(url)
-        if page:
-            return page
-        log.error(f'Unable to find resource: \'{url}\'')
-        abort(404)
+    # def get_or_404(self, url):
+    #     page = self.get(url)
+    #     if page:
+    #         return page
+    #     log.error(f'Unable to find resource: \'{url}\'')
+    #     abort(404)
 
     def get_bare(self, url):
-        path = self.path(url)
         if self.exists(url):
             return False
-        return Page(path, url, new=True)
+        id = len(PageTable.select().exec()) + 1
+        page = Page(id, url, "", "", "", "", new=True)
+        return page
 
     def move(self, url, newurl):
         source = os.path.join(self.root, url) + '.md'
@@ -291,7 +317,7 @@ class Wiki(object):
         # otherwise there are probably some '..' links in target path leading
         # us outside defined root directory
         if len(common) < len(root):
-            log.critical(f'Possible write attempt outside content directory: \'{newurl}\'')
+            log_wiki.critical(f'Possible write attempt outside content directory: \'{newurl}\'')
             raise RuntimeError(
                 'Possible write attempt outside content directory: '
                 '%s' % newurl)
@@ -315,20 +341,21 @@ class Wiki(object):
             :returns: a list of all the wiki pages
             :rtype: list
         """
-        # make sure we always have the absolute path for fixing the
-        # walk path
+
         pages = []
-        root = os.path.abspath(self.root)
-        for cur_dir, _, files in os.walk(root):
-            # get the url of the current directory
-            cur_dir_url = cur_dir[len(root)+1:]
-            for cur_file in files:
-                path = os.path.join(cur_dir, cur_file)
-                if cur_file.endswith('.md'):
-                    url = clean_url(os.path.join(cur_dir_url, cur_file[:-3]))
-                    page = Page(path, url)
-                    pages.append(page)
-        return sorted(pages, key=lambda x: x.title.lower())
+        result_list = PageTable.select().exec()
+        log_wiki.debug(f'Num pages on index call: {len(result_list)}')
+        for result in result_list:
+            id = result[0]
+            uri = result[1]
+            title = result[2]
+            content = result[3]
+            date_created = result[4]
+            last_edited = result[5]
+            page = Page(id, uri, title, content, date_created, last_edited)
+            pages.append(page)
+        return sorted (pages, key=lambda x: x.title.lower())
+
 
     def index_by(self, key):
         """

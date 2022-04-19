@@ -87,7 +87,7 @@ class UserManager(object):
 
         # users = self.read()
 
-        userdata = (UserTable.select().where(username=name).exec())
+        userdata = (UserTable.select().where("", username=name).exec())
         if len(userdata) == 0:
             return False
         userdata = userdata[0]
