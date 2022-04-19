@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}<span style="color: #ff8c00; ">Move a page</span>{% endblock title %}
+{% block title %}<span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Move a page</span>{% endblock title %}
 {% block content %}
 <form method="POST" class="form-inline">
     {{ form.hidden_tag() }}
@@ -10,5 +10,5 @@
 {% endblock content %}
 
 {% block sidebar %}
-    <p class="alert alert-success"><span style="color: #ff8c00; ">Be careful, the old url will be invalid immediately!</span></p>
+    <p class="alert alert-success"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Be careful, the old url will be invalid immediately!</span></p>
 {% endblock sidebar %}

@@ -9,28 +9,32 @@
 	</head>
 
 	<body>
-		<div class="navbar navbar-fixed-top bg_dark">
+		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
 				<div class="container">
 					<div class="row">
 						<div class="span12">
 							<a href="#" class="brand">{{ config.TITLE }}</a>
 							<ul class="nav">
-								<li><a href="{{ url_for('wiki.home') }}"><span style="color: #ff8c00; ">Home</span></a></li>
-								<li><a href="{{ url_for('wiki.index') }}"><span style="color: #ff8c00; ">Index</span></a></li>
-								<li><a href="{{ url_for('wiki.categories') }}"><span style="color: #ff8c00; ">Categories</span></a></li>
-								<li><a href="{{ url_for('wiki.search') }}"><span style="color: #ff8c00; ">Search</span></a></li>
+                                <li class="divider-vertical"></li>
+								<li><a href="{{ url_for('wiki.home') }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Home</span></a></li>
+                                <li class="divider-vertical"></li>
+								<li><a href="{{ url_for('wiki.index') }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Index</span></a></li>
+                                <li class="divider-vertical"></li>
+								<li><a href="{{ url_for('wiki.categories') }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Categories</span></a></li>
+                                <li class="divider-vertical"></li>
+								<li><a href="{{ url_for('wiki.search') }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Search</span></a></li>
 								<li class="divider-vertical"></li>
-								<li><a href="{{ url_for('wiki.create') }}"><span style="color: #ff8c00; ">New Page</span></a></li>
+								<li><a href="{{ url_for('wiki.create') }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">New Page</span></a></li>
 								<li class="divider-vertical"></li>
 								<li></li>
 							</ul>
 
 							<ul class="nav pull-right">
 								{% if current_user.is_anonymous %}
-                                    <li><a href="{{ url_for('wiki.user_login') }}"><span style="color: #ff8c00; ">Login</span></a></li>
+                                    <li><a href="{{ url_for('wiki.user_login') }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Login</span></a></li>
 								{% else %}
-                                    <li><a href="{{ url_for('wiki.user_logout') }}"><span style="color: #ff8c00; ">Logout</span></a></li>
+                                    <li><a href="{{ url_for('wiki.user_logout') }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Logout</span></a></li>
 								{% endif %}
 							</ul>
 						</div>
@@ -44,7 +48,7 @@
 				<div class="span10 offset1">
 					{% block header %}
 						<div class="page-header">
-							<h1>{% block title %}{{ page.title }}{% endblock title %}</h1>
+                            <h1>{% block title %}<span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">{{ page.title }}</span>{% endblock title %}</h1>
 						</div>
 					{% endblock header %}
 				</div>
@@ -62,7 +66,7 @@
 						{% endif %}
 					{% endwith %}
 					{% if form and form.errors %}
-						<div class="alert alert-error">Errors occured verifying your input. Please check the marked fields below.</div>
+                        <div class="alert alert-error"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Errors occured verifying your input. Please check the marked fields below.</span></div>
 					{% endif %}
 					{% block content %}
 					{% endblock content %}

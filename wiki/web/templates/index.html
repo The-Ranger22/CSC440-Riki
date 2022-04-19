@@ -1,34 +1,34 @@
 {% extends "base.html" %}
 
-{% block title %}<span style="color: #ff8c00; ">Page Index</span>{% endblock title %}
+{% block title %}<span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Page Index</span>{% endblock title %}
 
 {% block content %}
 {% if pages %}
 	<table class="table">
 		<thead>
 			<tr class = "backgroundText">
-                <th><span style="color: #ff8c00; ">Title</span></th>
-                <th><span style="color: #ff8c00; ">URL</span></th>
+                <th><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Title</span></th>
+                <th><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">URL</span></th>
 			</tr>
 		</thead>
 		<tbody class = "backgroundText">
 			{% for page in pages %}
 				<tr>
-                    <td><a href="{{ url_for('wiki.display', url=page.url) }}"><span style="color: #ff8c00; ">{{ page.title }}</span></a></td>
-                    <td><a href="{{ url_for('wiki.display', url=page.url) }}"><span style="color: #ff8c00; ">{{ page.url }}</span></a></td>
+                    <td><a href="{{ url_for('wiki.display', url=page.url) }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">{{ page.title }}</span></a></td>
+                    <td><a href="{{ url_for('wiki.display', url=page.url) }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">{{ page.url }}</span></a></td>
 				</tr>
 			{% endfor %}
 		</tbody>
 	</table>
 {% else %}
-    <p class = "backgroundText"><span style="color: #ff8c00; ">There are no pages yet.</span></p>
+    <p class = "backgroundText"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">There are no pages yet.</span></p>
 {% endif %}
 {% endblock content %}
 
 {% block sidebar %}
 <ul class="nav nav-tabs nav-stacked">
-    <li><a href="{{ url_for('wiki.create') }}"><span style="color: #ff8c00; ">New Page</span></a></li>
-    <li><a href="{{ url_for('wiki.categories') }}"><span style="color: #ff8c00; ">Categories</span></a></li>
-    <li><a href="{{ url_for('wiki.search') }}"><span style="color: #ff8c00; ">Search</span></a></li>
+    <li><a href="{{ url_for('wiki.create') }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">New Page</span></a></li>
+    <li><a href="{{ url_for('wiki.categories') }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Categories</span></a></li>
+    <li><a href="{{ url_for('wiki.search') }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Search</span></a></li>
 </ul>
 {% endblock sidebar %}

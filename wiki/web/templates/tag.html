@@ -7,20 +7,20 @@
 	<table class="table">
 		<thead>
 			<tr class = "backgroundText">
-                <th><span style="color: #ff8c00; ">Title</span></th>
-                <th><span style="color: #ff8c00; ">URL</span></th>
+                <th><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Title</span></th>
+                <th><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">URL</span></th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for page in pages %}
 				<tr class = "backgroundText">
-                    <td><a href="{{ url_for('wiki.display', url=page.url) }}"><span style="color: #ff8c00; ">{{ page.title }}</span></a></td>
-                    <td><a href="{{ url_for('wiki.display', url=page.url) }}"><span style="color: #ff8c00; ">{{ page.url }}</span></a></td>
+                    <td><a href="{{ url_for('wiki.display', url=page.url) }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">{{ page.title }}</span></a></td>
+                    <td><a href="{{ url_for('wiki.display', url=page.url) }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">{{ page.url }}</span></a></td>
                 </tr>
 			{% endfor %}
 		</tbody>
 	</table>
 {% else %}
-    <p><span style="color: #ff8c00; ">There are no pages tagged {{ tag }}.</span></p>
+    <p><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">There are no pages tagged {{ tag }}.</span></p>
 {% endif %}
 {% endblock content %}

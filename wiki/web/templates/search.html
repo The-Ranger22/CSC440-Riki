@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}
 {% if search %}
-	Results for "{{ search }}"
+    <span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Results for "{{ search }}"</span>
 {% else %}
-	Search
+    <span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Search</span>
 {% endif %}
 {% endblock title %}
 
@@ -28,7 +28,7 @@
             <div class="offset1 span8">
                 <dl>
                     <dt>
-                        <a href="{{ url_for('wiki.display', url=result.uri) }}">{{ result.title }}</a>
+                        <a href="{{ url_for('wiki.display', url=result.uri) }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">{{ result.title }}</span></a>
                         <div class="pull-right">{{ result.date_created }}</div>
                     </dt>
                 </dl>

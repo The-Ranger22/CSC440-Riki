@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Categories{% endblock title %}
+{% block title %}<span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Categories</span>{% endblock title %}
 {% block content %}
     <style>
         .box{
@@ -20,7 +20,7 @@
         {% for tag in tags %}
             <tr>
                 <th id="{{ tag }}">
-                    {{ tag }}
+                    <span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">{{ tag }}</span>
                 </th>
             </tr>
             {% for page in pages %}
@@ -29,7 +29,7 @@
                         <td>
                             <a id="test" class="previewbox-anchor" href="{{ url_for('wiki.display',url=page.url) }}">{{ page.title }}</a>
                             <div class="box">
-                                <iframe src="{{ url_for('wiki.display',url=page.url) }}" width = "500px" height = "500px">
+                                <iframe src="{{ url_for('wiki.display',url=page.url) }}" width = "650px" height = "500px">
                                 </iframe>
                             </div>
                         </td>
@@ -37,14 +37,14 @@
                 {% endif %}
             {% endfor %}
         {% endfor %}
-        <tr><th id="Uncatagorized">Uncatagorized</th></tr>
+        <tr><th id="Uncatagorized"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Uncatagorized</span></th></tr>
         {% for page in pages %}
             {% if page.tags not in tags %}
                 <tr>
                     <td>
                         <a class="previewbox-anchor" href="{{ url_for('wiki.display',url=page.url) }}">{{ page.title }}</a>
                         <div class="box">
-                            <iframe src="{{ url_for('wiki.display',url=page.url) }}" width = "500px" height = "500px">
+                            <iframe src="{{ url_for('wiki.display',url=page.url) }}" width = "650px" height = "500px">
                             </iframe>
                         </div>
                     </td>

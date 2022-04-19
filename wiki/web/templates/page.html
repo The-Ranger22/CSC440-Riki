@@ -1,38 +1,38 @@
 {% extends "base.html" %}
 
 {% block title %}
-    <span style="color: #ff8c00; ">{{ page.title }}</span>
+    <span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">{{ page.title }}</span>
 {% endblock title %}
 
 {% block content %}
   <div id="confirmDelete" class="modal hide fade" aria-hidden="true">
     <div class="modal-header">
-        <h3><span style="color: #ff8c00; ">Are you sure?</span></h3>
+        <h3><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Are you sure?</span></h3>
     </div>
     <div class="modal-body">
-        <span style="color: #ff8c00; "><p>Are you sure you want to delete {{ page.title }}?  This cannot be undone.</p></span>
+        <span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' "><p>Are you sure you want to delete {{ page.title }}?  This cannot be undone.</p></span>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">No</a>
-        <a href="{{ url_for('wiki.delete', url=page.url) }}" class="btn btn-danger"><span style="color: #ff8c00; ">Yes, delete.</span></a>
+        <a href="{{ url_for('wiki.delete', url=page.url) }}" class="btn btn-danger"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Yes, delete.</span></a>
     </div>
   </div>
-	{{ page }}
+    <span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">{{ page }}</span>
 {% endblock content %}
 
 {% block sidebar %}
 {% if page.tags %}
-    <h3><span style="color: #ff8c00; ">Tags</span></h3>
+    <h3><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Tags</span></h3>
   <ul>
       {% for tag in page.tags.split(',') %}
-          <li><a href="{{ url_for('wiki.tag', name=tag.strip()) }}"><span style="color: #ff8c00; ">{{ tag|trim }}</span></a></li>
+          <li><a href="{{ url_for('wiki.tag', name=tag.strip()) }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">{{ tag|trim }}</span></a></li>
       {% endfor %}
   </ul>
 {% endif %}
-    <h3><span style="color: #ff8c00; ">Actions</span></h3>
+    <h3><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Actions</span></h3>
 <ul class="nav nav-tabs nav-stacked">
-    <li><a href="{{ url_for('wiki.edit', url=page.url) }}"><span style="color: #ff8c00; ">Edit</span></a></li>
-    <li><a href="{{ url_for('wiki.move', url=page.url) }}"><span style="color: #ff8c00; ">Move</span></a></li>
-    <li><a href="#confirmDelete" data-toggle="modal" class="text-error"><span style="color: #ff8c00; ">Delete</span></a></li>
+    <li><a href="{{ url_for('wiki.edit', url=page.url) }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Edit</span></a></li>
+    <li><a href="{{ url_for('wiki.move', url=page.url) }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Move</span></a></li>
+    <li><a href="#confirmDelete" data-toggle="modal" class="text-error"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Delete</span></a></li>
 </ul>
 {% endblock sidebar %}
