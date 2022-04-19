@@ -4,7 +4,7 @@
 """
 import logging
 
-from flask import Blueprint, current_app
+from flask import Blueprint
 from flask import flash
 from flask import redirect
 from flask import render_template
@@ -24,9 +24,10 @@ from wiki.web import current_wiki
 from wiki.web import current_users
 from wiki.web.user import protect
 from wikiDB.DatabaseModel import Page
+import re
+
 log = logging.getLogger('wiki')
 bp = Blueprint('wiki', __name__)
-
 
 
 @bp.route('/')
@@ -135,6 +136,11 @@ def categories():
 @bp.route('/search/', methods=['GET', 'POST'])
 @protect
 def search():
+    """
+    Defines a route to display the search page or the search
+    page with its results based on the search terms given by the user.
+    @return: Render template for search page
+    """
     form = SearchForm()
     if form.validate_on_submit():
         searchText = form.term.data
@@ -142,39 +148,35 @@ def search():
         caseInsensitive = form.ignore_case.data
         option = form.option.data
 
-        term = "%"
-        if searchText[0] == "\"" and searchText[len(searchText) - 1] == "\"":
-            searchText = searchText[1:-1]
-            term = "%{}%".format(searchText)
-        else:
-            terms = searchText.split()
-            for t in terms:
-                term = term + t + '%'
-        searchTerm = term.encode()
-        log.debug(f'Processed search text: \'{searchTerm}\'')
-        results = None
-
+        results = query_for_regex(option, searchText, caseInsensitive)
         if not caseInsensitive:
-            results = query_for_search(option, searchTerm)
-
-            words = term[1:-1].split('%')
-            idList = []
-            for result in results:
-                if all((word.encode() in result.content for word in words) or (word.encode() in result.title
-                       for word in words)):
-                    idList.append(result.id)
-            if option == "default":
-                results = Page.query.filter(Page.id.in_(idList)).all()
-            elif option == "CDO":
-                results = Page.query.filter(Page.id.in_(idList)).order_by(Page.date_created).all()
-            elif option == "CDN":
-                results = Page.query.filter(Page.id.in_(idList)).order_by(Page.date_created.desc()).all()
-            elif option == "EDO":
-                results = Page.query.filter(Page.id.in_(idList)).order_by(Page.last_edited).all()
-            elif option == "EDN":
-                results = Page.query.filter(Page.id.in_(idList)).order_by(Page.last_edited.desc()).all()
+            if not results:
+                term = format_term(searchText)
+                words = term[1:-1].split('%')
+                idList = []
+                searchTerm = term.encode()
+                log.debug(f'Processed search text: \'{searchTerm}\'')
+                results = Page.query.filter(Page.content.like(searchTerm) | Page.title.like(searchTerm)).all()
+                for result in results:
+                    if all((word.encode() in result.content for word in words) or (word.encode() in result.title
+                           for word in words)):
+                        idList.append(result.id)
+                if option == "default":
+                    results = Page.query.filter(Page.id.in_(idList)).all()
+                elif option == "CDO":
+                    results = Page.query.filter(Page.id.in_(idList)).order_by(Page.date_created).all()
+                elif option == "CDN":
+                    results = Page.query.filter(Page.id.in_(idList)).order_by(Page.date_created.desc()).all()
+                elif option == "EDO":
+                    results = Page.query.filter(Page.id.in_(idList)).order_by(Page.last_edited).all()
+                elif option == "EDN":
+                    results = Page.query.filter(Page.id.in_(idList)).order_by(Page.last_edited.desc()).all()
         else:
-            results = query_for_search(option, searchTerm)
+            if not results:
+                term = format_term(searchText)
+                searchTerm = term.encode()
+                log.debug(f'Processed search text: \'{searchTerm}\'')
+                results = query_for_search(option, searchTerm)
 
         return render_template('search.html', form=form, results=results, search=form.term.data,
                                case=form.ignore_case.data)
@@ -234,7 +236,15 @@ def page_not_found(error):
 
 
 def query_for_search(option, search_term):
+    """
+    PYDOC
+    Returns articles that match the term or terms that was given by the user.
+    @param option: sort by option for articles
+    @param search_term: term or terms given by the user to search
+    @return: a list of all the articles that matches the term or terms given
+    """
     log.info(f'Searching for pages with criteria: \'{search_term}\', option: \'{option}\'')
+
     results = None
     if option == "default":
         results = Page.query.filter(Page.content.like(search_term) | Page.title.like(search_term)).all()
@@ -251,3 +261,58 @@ def query_for_search(option, search_term):
         results = Page.query.filter(Page.content.like(search_term) | Page.title.like(search_term)) \
             .order_by(Page.last_edited.desc()).all()
     return results
+
+
+def query_for_regex(option, search_term, case_insensitive):
+    """
+    Returns articles that match the regex that was given by the user.
+    @param option: sort by option for articles
+    @param search_term: regex given by the user to search
+    @param case_insensitive: a boolean that determines if the search is case-sensitive or not
+    @return: a list of all the articles that matches the regex given
+    """
+    log.info(f'Searching for pages with criteria: \'{search_term}\', option: \'{option}\'')
+
+    regexIdList = []
+    queryResults = Page.query.all()
+    results = None
+    if not case_insensitive:
+        for result in queryResults:
+            content = str(result.content)
+            title = str(result.title)
+            if re.search(search_term, content) or re.search(search_term, title):
+                regexIdList.append(result.id)
+    else:
+        for result in queryResults:
+            content = str(result.content)
+            title = str(result.title)
+            if re.search(search_term, content, re.IGNORECASE) or re.search(search_term, title, re.IGNORECASE):
+                regexIdList.append(result.id)
+    if option == "default":
+        results = Page.query.filter(Page.id.in_(regexIdList)).all()
+    elif option == "CDO":
+        results = Page.query.filter(Page.id.in_(regexIdList)).order_by(Page.date_created).all()
+    elif option == "CDN":
+        results = Page.query.filter(Page.id.in_(regexIdList)).order_by(Page.date_created.desc()).all()
+    elif option == "EDO":
+        results = Page.query.filter(Page.id.in_(regexIdList)).order_by(Page.last_edited).all()
+    elif option == "EDN":
+        results = Page.query.filter(Page.id.in_(regexIdList)).order_by(Page.last_edited.desc()).all()
+    return results
+
+
+def format_term(searchText):
+    """
+    Returns formatted search term(s)
+    @param searchText: user's raw search text
+    @return: formatted search term(s)
+    """
+    term = "%"
+    if searchText[0] == "\"" and searchText[len(searchText) - 1] == "\"":
+        searchText = searchText[1:-1]
+        term = "%{}%".format(searchText)
+    else:
+        terms = searchText.split()
+        for t in terms:
+            term = term + t + '%'
+    return term

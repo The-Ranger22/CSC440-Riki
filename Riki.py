@@ -9,11 +9,11 @@ from config import LOGGING_CONFIG
 from wikiDB import setup, db_file_path
 
 from flask_sqlalchemy import SQLAlchemy
+from wiki import create_app
 
 logging.config.dictConfig(LOGGING_CONFIG)
 log = logging.getLogger('wiki')
 
-from wiki import create_app
 
 directory = os.getcwd()
 log.debug(f'CWD: {directory}')
