@@ -334,6 +334,7 @@ class Wiki(object):
         os.remove(path)
         return True
 
+
     def index(self):
         """
             Builds up a list of all the available pages.
