@@ -183,7 +183,7 @@ class Page(object):
         self.id = id
         self.url = url
         self.notTheOtherTitle = title
-        self.content = content
+        self.content = content if not isinstance(content, bytes) else content.decode("UTF-8")
         self.date_created = date_created
         self.last_edited = last_edited
         self._meta = OrderedDict()
@@ -210,7 +210,7 @@ class Page(object):
             lines.append(line)
             log_wiki.debug(f'line: \'{line}\'')
         self.content = "\n".join(lines)
-        PageTable.insert(self.url, self.title, self.content, now, now).exec()
+        PageTable.insert(self.url, self.title, bytes(self.content, "UTF-8"), now, now).exec()
         if update:
             self.render()
 
@@ -259,7 +259,7 @@ class Wiki(object):
         self.root = root
 
     def get_from_DB(self, url):
-        result_list = PageTable.select().where('OR',URI=url,title=url).exec()
+        result_list = PageTable.select().where("OR", URI=url).exec()
         if len(result_list) == 0:
             log_db.error(f'Unable to find page with url/title: \'{url}\'')
             abort(404)
@@ -346,16 +346,9 @@ class Wiki(object):
         pages = []
         result_list = PageTable.select().exec()
         log_wiki.debug(f'Num pages on index call: {len(result_list)}')
-        for result in result_list:
-            id = result[0]
-            uri = result[1]
-            title = result[2]
-            content = result[3]
-            date_created = result[4]
-            last_edited = result[5]
-            page = Page(id, uri, title, content, date_created, last_edited)
-            pages.append(page)
-        return sorted (pages, key=lambda x: x.title.lower())
+        for id, uri, title, content, date_created, last_edited in result_list:
+            pages.append(Page(id, uri, title, content, date_created, last_edited))
+        return sorted(pages, key=lambda x: x.title.lower())
 
 
     def index_by(self, key):

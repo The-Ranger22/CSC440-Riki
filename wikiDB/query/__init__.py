@@ -2,12 +2,16 @@
 # region Imports
 import logging
 
+import config
 import wikiDB
 from sqlite3 import connect
 from sqlite3 import DatabaseError
 from abc import ABC, abstractmethod
 # endregion
 log = logging.getLogger('database')
+
+
+
 
 def _query(method):
     """
@@ -199,6 +203,8 @@ class UserTable(AbstractTable):
     def delete(cls):
         return cls.Query(cls.name(), "DELETE")
 # endregion
+
+
 
 # region Page Table
 class PageTable(AbstractTable):
