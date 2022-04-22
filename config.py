@@ -76,4 +76,5 @@ LOGGING_CONFIG = {
         },
     }
 }
+TEXT_ENCODING = "UTF-8"
 

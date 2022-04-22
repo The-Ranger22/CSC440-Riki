@@ -3,6 +3,9 @@ from sqlite3 import connect, Connection
 from os import getcwd
 from os.path import exists
 
+import config
+from datetime import datetime
+
 log = logging.getLogger('database')
 db_name = 'wiki'
 file_ext = ".db"
@@ -21,6 +24,23 @@ def setup():
             raise TypeError
         log.info("Creating DB...")
         conn.executescript(query)
+
+        ### Inserting the home page
+
+        conn.execute(
+            "INSERT INTO PAGE(URI, TITLE, CONTENT, DATE_CREATED, LAST_EDITED) VALUES (?, ?, ?, ?, ?)",
+            (
+                'home',
+                'Home',
+                bytes('title: Home\ntags: \n\n**TEST WIKI, PLEASE IGNORE**', config.TEXT_ENCODING),
+                datetime.now(),
+                datetime.now()
+            )
+        )
+
+
+
+
     log.info("Db created.")
 
 
