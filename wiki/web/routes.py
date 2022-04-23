@@ -129,7 +129,29 @@ def tag(name):
 @protect
 def categories():
     tags = current_wiki.get_tags()
-    pages = current_wiki.index()
+    page = current_wiki.index()
+    pages = []
+    for item in page:
+        pageTags = (item.tags).split(',')
+        if item.tags == '':
+            pages.append([[item.title,item.url],"Uncategorized"])
+        else:
+            pages.append([[item.title,item.url],[pageTags]])
+    #   BACKUP IN CASE DATABASE SWITCH MESSES WITH FUNCTIONS ABOVE
+    #   POSSIBLY PASS [[[PAGE.NAME,PAGE.URL],CATEGORY],[PAGE,CATEGORY]] LIST CREATED BEFORE PASSING TO HTML
+    #   IF QUERIES CAN'T BE DONE IN HTML
+    #   tags = TagTable.select(name=True).exec()
+    #   pages = PageTable.select(title=True).exec()
+    #   relations = [tagid,pageid]
+    #   for (tag in tags){
+    #       print(tag.name)
+    #       for (relationship in relationships){
+    #           if tag.id = relationship[0]{
+    #               page = PageTable.query(PageID = relationship[1])
+    #               <a href=(page.url)>page.name</a>
+    #           }
+    #       }
+    #   }
     return render_template('categories.html', pages=pages, tags=tags)
 
 

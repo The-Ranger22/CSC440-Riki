@@ -1,18 +1,74 @@
 {% extends "base.html" %}
 
-{% block title %}<span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Categories</span>{% endblock title %}
+{% block title %}
+    <span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Categories</span>{% endblock title %}
 {% block content %}
     <style>
-        .box{
-            display: none;
+        .box {
+            display:none;
+            position: absolute;
+            z-index: +100;
+            left: 50px;
         }
-        a:hover + .box,.box:hover{
+
+        a:hover + .box, .box:hover {
             display: block;
-            position: relative;
-            z-index: 100;
-            width: 50%
         }
     </style>
+
+    <table class="table">
+        <thead>
+        </thead>
+        <tbody>
+            {% for tag in tags %}
+                    <tr>
+                        <th id="{{ tag }}">
+                            <span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">{{ tag }}</span>
+                        </th>
+                    </tr>
+                {% for pageEntry in pages %}
+                    {% for pageTags in pageEntry[1] %}
+                        {% for pageTag in pageTags %}
+                            {% if pageTag == tag %}
+                                <tr>
+                                    <td>
+                                        <a id="test" class="previewbox-anchor"
+                                           href="{{ url_for('wiki.display',url=pageEntry[0][1]) }}">{{ pageEntry[0][0] }}</a>
+                                        <div class="box">
+                                            <iframe src="{{ url_for('wiki.display',url=pageEntry[0][1]) }}" width="650px"
+                                                    height="500px">
+                                            </iframe>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+            <tr>
+                <th id="{{ tag }}">
+                    <span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Uncategorized</span>
+                </th>
+            </tr>
+            {% for pageEntry in pages %}
+                {% if pageEntry[1] == "Uncategorized" %}
+                    <tr>
+                        <td>
+                            <a id="test" class="previewbox-anchor"
+                               href="{{ url_for('wiki.display',url=pageEntry[0][1]) }}">{{ pageEntry[0][0] }}</a>
+                            <div class="box">
+                                <iframe src="{{ url_for('wiki.display',url=pageEntry[0][1]) }}" width="650px"
+                                        height="500px">
+                                </iframe>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    <!--
 	<table class="table">
 		<thead>
 		</thead>
@@ -27,7 +83,8 @@
                 {% if tag in page.tags %}
                     <tr>
                         <td>
-                            <a id="test" class="previewbox-anchor" href="{{ url_for('wiki.display',url=page.url) }}">{{ page.title }}</a>
+                            <a id="test" class="previewbox-anchor" href="{{ url_for('wiki.display',url=page.url) }}">
+        {{ page.title }}</a>
                             <div class="box">
                                 <iframe src="{{ url_for('wiki.display',url=page.url) }}" width = "650px" height = "500px">
                                 </iframe>
@@ -37,9 +94,9 @@
                 {% endif %}
             {% endfor %}
         {% endfor %}
-        <tr><th id="Uncatagorized"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Uncatagorized</span></th></tr>
+        <tr><th id="Uncategorized"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Uncatagorized</span></th></tr>
         {% for page in pages %}
-            {% if page.tags not in tags %}
+            {% if page.tags not in tags%}
                 <tr>
                     <td>
                         <a class="previewbox-anchor" href="{{ url_for('wiki.display',url=page.url) }}">{{ page.title }}</a>
@@ -53,14 +110,14 @@
         {% endfor %}
         </tbody>
     </table>
-
+-->
 
 {% endblock content %}
 
 {% block sidebar %}
     <div style="position: fixed;">
         <ul>
-            {% for tag in tags%}
+            {% for tag in tags %}
                 <li>
                     <a href="#{{ tag }}">{{ tag }}</a>
                 </li>
