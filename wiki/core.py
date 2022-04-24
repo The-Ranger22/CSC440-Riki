@@ -328,10 +328,11 @@ class Wiki(object):
         os.rename(source, target)
 
     def delete(self, url):
-        path = self.path(url)
-        if not self.exists(url):
-            return False
-        os.remove(path)
+        PageTable.delete().where("", URI=url).exec()
+        # path = self.path(url)
+        # if not self.exists(url):
+        #     return False
+        # os.remove(path)
         return True
 
 

@@ -103,7 +103,7 @@ def move(url):
 @bp.route('/delete/<path:url>/')
 @protect
 def delete(url):
-    page = current_wiki.get_or_404(url)
+    page = current_wiki.get_from_DB(url)
     current_wiki.delete(url)
     flash('Page "%s" was deleted.' % page.title, 'success')
     log.info(f'Page \'{page.title}\' was successfully deleted')
@@ -190,6 +190,7 @@ def user_login():
         user = current_users.get_user(form.name.data.strip())
         login_user(user)
         user.set('authenticated', True)
+        log.info(f'User \'{form.name.data}\' has logged on')
         flash('Login successful.', 'success')
         return redirect(request.args.get("next") or url_for('wiki.index'))
     return render_template('login.html', form=form)
@@ -201,6 +202,7 @@ def user_logout():
     current_user.set('authenticated', False)
     logout_user()
     flash('Logout successful.', 'success')
+    log.info(f'User has logged out')
     return redirect(url_for('wiki.index'))
 
 
