@@ -328,12 +328,13 @@ class Wiki(object):
         os.rename(source, target)
 
     def delete(self, url):
-        PageTable.delete().where("", URI=url).exec()
-        # path = self.path(url)
-        # if not self.exists(url):
-        #     return False
-        # os.remove(path)
-        return True
+        log_wiki.info(f'Deleting page with url: \'{url}\'')
+        if(PageTable.select().where("", URI=url).exec):
+            PageTable.delete().where("", URI=url).exec()
+            log_wiki.info('Page deleted.')
+            return True
+        log_wiki.info("Page did not exist. Don't know how this happened.")
+        return False
 
 
     def index(self):
