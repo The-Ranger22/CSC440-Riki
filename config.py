@@ -1,4 +1,5 @@
 # encoding: utf-8
+import os
 from os import getcwd
 SECRET_KEY = 'a unique and long key'
 TITLE = 'Test Wiki, Please Ignore'
@@ -6,6 +7,7 @@ HISTORY_SHOW_MAX = 30
 PIC_BASE = '/static/content/'
 CONTENT_DIR = f'{getcwd()}/content'
 USER_DIR = f'{getcwd()}/user'
+LOG_DIR = f'{getcwd()}/logs'
 NUMBER_OF_HISTORY = 5
 PRIVATE = True
 LOG_LEVEL = 'DEBUG' #Should be set to INFO in prod
@@ -31,7 +33,7 @@ LOGGING_CONFIG = {
             'level': 'DEBUG',
             'formatter': 'error',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': f'{getcwd()}\\logs\\Riki.log',
+            'filename': os.path.join(LOG_DIR, 'Riki.log'),
             'mode': 'a',
             'maxBytes': 1048576,
             'backupCount': 10
@@ -39,7 +41,7 @@ LOGGING_CONFIG = {
             'level': 'DEBUG',
             'formatter': 'error',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': f'{getcwd()}\\logs\\Riki_DB.log',
+            'filename': os.path.join(LOG_DIR, 'Riki_DB.log'),
             'mode': 'a',
             'maxBytes': 1048576,
             'backupCount': 10
@@ -47,7 +49,7 @@ LOGGING_CONFIG = {
             'level': 'DEBUG',
             'formatter': 'error',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': f'{getcwd()}\\logs\\external.log',
+            'filename': os.path.join(LOG_DIR, 'external.log'),
             'mode': 'a',
             'maxBytes': 1048576,
             'backupCount': 10
