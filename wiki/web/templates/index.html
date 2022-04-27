@@ -1,34 +1,67 @@
+<!--
+ Isaiah Snapp
+ Responsible for CSS and overall usability for the site.
+ You will see some span headers within this file and other html files.
+ These span headers include the text color and the font type.
+ I realize something that I could've done better would be to write a span class
+ in the bootstrap.css file so that it could be used universally through the HTML pages.
+ I also created a CSS file called backgroundcolor.css which allowed me to add specific
+ colored backgrounds to different aspects of the webpages. For example, we have the
+ index page which has a white background around it, so it could be differentiated from
+ the actual background color. Something else I had to make sure all the different pages being added
+ had the correct color with the markdown page as well we have the ability for when a different
+ page with a different title will continue to stay the same color no matter what the text says.
+ The things that I have changed has been able to be very versatile with many features that
+ we have added including the preview ability on the categories page.
+ So basically in conclusion here is a list of things that I have done:
+ - Added a CSS page for changing the background color of the website (color listed below)
+ - Changed background color to #1f6377
+ - Changed text color to #ff8c00
+ - Changed the font to JetBrains Mono ExtraBold
+ - Made sure that all the text color was the same throughout the site as to keep consistency
+ - Added the ability to change text color of the main content of an article to the main web pages text color
+ - Added a white background to some tables as to show a difference in the background color such as in the index page
+ - Added vertical dividers between the navigation bar buttons to show space and a more filling sense to the bar
+ - Changed text color of navigation buttons as well as the Add, Move, Edit, Delete buttons to the sites main color
+ - Made sure the text color in the preview was presenting with color as the actual page
+ - Changed it so that the text color of the search page with the results correctly displays
+ Changes that could be improvements:
+    - Set the text color and the font in the css page so it could be used universally when new pages are added
+    - Removing the home page's delete button
+    - Adding an ability to insert images into a new page when a user creates one
+    - Hovering over page title gives a brief description of a page
+ -->
 {% extends "base.html" %}
 
-{% block title %}<span style="color: #ff8c00; ">Page Index</span>{% endblock title %}
+{% block title %}<span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Page Index</span>{% endblock title %}
 
 {% block content %}
 {% if pages %}
 	<table class="table">
 		<thead>
 			<tr class = "backgroundText">
-                <th><span style="color: #ff8c00; ">Title</span></th>
-                <th><span style="color: #ff8c00; ">URL</span></th>
+                <th><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Title</span></th>
+                <th><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">URL</span></th>
 			</tr>
 		</thead>
 		<tbody class = "backgroundText">
 			{% for page in pages %}
 				<tr>
-                    <td><a href="{{ url_for('wiki.display', url=page.url) }}"><span style="color: #ff8c00; ">{{ page.title }}</span></a></td>
-                    <td><a href="{{ url_for('wiki.display', url=page.url) }}"><span style="color: #ff8c00; ">{{ page.url }}</span></a></td>
+                    <td><a href="{{ url_for('wiki.display', url=page.url) }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">{{ page.title }}</span></a></td>
+                    <td><a href="{{ url_for('wiki.display', url=page.url) }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">{{ page.url }}</span></a></td>
 				</tr>
 			{% endfor %}
 		</tbody>
 	</table>
 {% else %}
-    <p class = "backgroundText"><span style="color: #ff8c00; ">There are no pages yet.</span></p>
+    <p class = "backgroundText"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">There are no pages yet.</span></p>
 {% endif %}
 {% endblock content %}
 
 {% block sidebar %}
 <ul class="nav nav-tabs nav-stacked">
-    <li><a href="{{ url_for('wiki.create') }}"><span style="color: #ff8c00; ">New Page</span></a></li>
-    <li><a href="{{ url_for('wiki.categories') }}"><span style="color: #ff8c00; ">Categories</span></a></li>
-    <li><a href="{{ url_for('wiki.search') }}"><span style="color: #ff8c00; ">Search</span></a></li>
+    <li><a href="{{ url_for('wiki.create') }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">New Page</span></a></li>
+    <li><a href="{{ url_for('wiki.categories') }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Categories</span></a></li>
+    <li><a href="{{ url_for('wiki.search') }}"><span style="color: #ff8c00; font-family: 'JetBrains Mono ExtraBold' ">Search</span></a></li>
 </ul>
 {% endblock sidebar %}
