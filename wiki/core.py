@@ -16,6 +16,8 @@ from flask import abort
 from flask import url_for
 import markdown
 import datetime
+
+import config
 from wikiDB.query import PageTable
 log_wiki = logging.getLogger('wiki')
 log_db = logging.getLogger('database')
@@ -98,6 +100,8 @@ class Processor(object):
 
             :param str text: the text to process
         """
+
+
         self.md = markdown.Markdown([
             'codehilite',
             'fenced_code',
@@ -188,15 +192,22 @@ class Page(object):
         self.last_edited = last_edited
         self._meta = OrderedDict()
         if not new:
-            #self.load()
             self.render()
 
     def __repr__(self):
         return "<Page: {}@{}>".format(self.url, self.path)
 
-    def load(self):
-        with open(self.path, 'r', encoding='utf-8') as f:
-            self.content = f.read()
+    def load(self, form):
+
+        self['title'] = form.title.data
+        self['body'] = form.body.data
+        self['tags'] = form.tags.data
+
+
+        self.content = f"title: {self['title']}\ntags: {self['tags']}\n\n{self['body']}"
+
+
+
 
     def render(self):
         processor = Processor(self.content)
@@ -209,8 +220,18 @@ class Page(object):
             line = '%s: %s\n' % (key, value)
             lines.append(line)
             log_wiki.debug(f'line: \'{line}\'')
-        self.content = "\n".join(lines)
-        PageTable.insert(self.url, self.title, bytes(self.content, "UTF-8"), now, now).exec()
+
+
+        #PageTable.insert(self.url, self.title, bytes(self.content, "UTF-8"), now, now).exec()
+
+        if len(PageTable.select(URI=True).where(separator="OR", URI=self.url).exec()) != 0:
+            PageTable\
+                .update(title=self.title, content=bytes(self.content, config.TEXT_ENCODING), last_edited=now)\
+                .where(separator="OR", URI=self.url)\
+                .exec()
+        else:
+            PageTable.insert(self.url, self.title, bytes(self.content, config.TEXT_ENCODING), now, now).exec()
+
         if update:
             self.render()
 
@@ -286,9 +307,18 @@ class Wiki(object):
 
     def get(self, url):
         path = self.path(url)
+        log_wiki.debug(f"Attempting to get page at {url}")
         #path = os.path.join(self.root, url + '.md')
         if self.exists(url):
-            return Page(path, url)
+            returned_tup = PageTable.select().where(separator='', URI=url).exec()[0]
+            return Page(
+                returned_tup[0],  # id
+                returned_tup[1],  # URI
+                returned_tup[2],  # TITLE
+                returned_tup[3],  # CONTENT
+                returned_tup[4],  # DATE CREATED
+                returned_tup[5]   # LAST EDITED
+            )
         return None
 
     # def get_or_404(self, url):

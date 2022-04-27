@@ -71,7 +71,7 @@ def edit(url):
     if form.validate_on_submit():
         if not page:
             page = current_wiki.get_bare(url)
-        form.populate_obj(page)
+        page.load(form)
         page.save()
         flash('"%s" was saved.' % page.title, 'success')
         log.info(f'Successfully saved page \'{page.title}\'')

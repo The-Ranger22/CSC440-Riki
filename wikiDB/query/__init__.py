@@ -1,6 +1,7 @@
 
 # region Imports
 import logging
+import traceback
 
 import config
 import wikiDB
@@ -15,7 +16,7 @@ log = logging.getLogger('database')
 
 def _query(method):
     """
-    A decorator responsible for connecting to a SQLite database and return the query result (if any).
+    A decorator responsible for connecting to a SQLite database and returning the query result (if any).
     @param method: the query method to be decorated
     @return: the query wrapper responsible for connecting to the database
     """
@@ -26,22 +27,21 @@ def _query(method):
         @return:
         """
         result = -1
+        conn = connect(wikiDB.db_file_path(), timeout=20)
         try:
-            conn = connect(wikiDB.db_file_path())
             cursor = conn.cursor()
-
             query_format, arguments = method(ref)
-
             log.debug(f'Attempting query: {query_format}')
             cursor.execute("PRAGMA foreign_keys = ON;")
-            cursor.execute(query_format, arguments)  # TODO: Start enforcing the relational constrains of foreign keys
+            cursor.execute(query_format, arguments)
             result = cursor.fetchall()
             conn.commit()
+        except Exception as e:
+            log.error(traceback.format_exc())
+        finally:
             conn.close()
+        return result
 
-            return result
-        except Exception:
-            raise DatabaseError
     return query_wrap
 
 def _kwargs_sq_processor(kwargs):
@@ -98,7 +98,8 @@ class AbstractTable(ABC):
                 else:
                     query_cmd = f"SELECT {', '.join(args)} FROM {table}"
             elif query_type == "UPDATE":
-                query_cmd = f"UPDATE {table} SET {', '.join([f'{key}={value}' for key, value in kwargs.items()])}"
+                query_cmd = f"UPDATE {table} SET {', '.join([f'{key}=?' for key, value in kwargs.items()])}"
+                self._args = list(kwargs.values())
             elif query_type == "DELETE":
                 query_cmd = f"DELETE FROM {table}"
 
