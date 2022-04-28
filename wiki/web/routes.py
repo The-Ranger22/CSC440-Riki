@@ -91,7 +91,7 @@ def preview():
 @bp.route('/move/<path:url>/', methods=['GET', 'POST'])
 @protect
 def move(url):
-    page = current_wiki.get_or_404(url)
+    page = current_wiki.get_from_DB(url)
     form = URLForm(obj=page)
     if form.validate_on_submit():
         newurl = form.url.data

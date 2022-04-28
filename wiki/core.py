@@ -321,13 +321,6 @@ class Wiki(object):
             )
         return None
 
-    # def get_or_404(self, url):
-    #     page = self.get(url)
-    #     if page:
-    #         return page
-    #     log.error(f'Unable to find resource: \'{url}\'')
-    #     abort(404)
-
     def get_bare(self, url):
         if self.exists(url):
             return False
@@ -336,26 +329,16 @@ class Wiki(object):
         return page
 
     def move(self, url, newurl):
-        source = os.path.join(self.root, url) + '.md'
-        target = os.path.join(self.root, newurl) + '.md'
-        # normalize root path (just in case somebody defined it absolute,
-        # having some '../' inside) to correctly compare it to the target
-        root = os.path.normpath(self.root)
-        # get root path longest common prefix with normalized target path
-        common = os.path.commonprefix((root, os.path.normpath(target)))
-        # common prefix length must be at least as root length is
-        # otherwise there are probably some '..' links in target path leading
-        # us outside defined root directory
-        if len(common) < len(root):
-            log_wiki.critical(f'Possible write attempt outside content directory: \'{newurl}\'')
-            raise RuntimeError(
-                'Possible write attempt outside content directory: '
-                '%s' % newurl)
-        # create folder if it does not exists yet
-        folder = os.path.dirname(target)
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-        os.rename(source, target)
+        if (PageTable.select().where("", URI=newurl).exec()):
+            msg = f'Cannot move page to url \'{newurl}\' as it already exists'
+            log_wiki.error(msg)
+            raise ValueError(msg)
+        elif (url == 'home'):
+            raise ValueError('Cannot move the home page!')
+        else:
+            log_wiki.info(f'Moved page from url: \'{url}\' to url: \'{newurl}\'')
+            PageTable.update(URI=newurl).where("", URI=url).exec()
+
 
     def delete(self, url):
         log_wiki.info(f'Deleting page with url: \'{url}\'')
