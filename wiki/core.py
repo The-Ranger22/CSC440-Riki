@@ -329,6 +329,12 @@ class Wiki(object):
         return page
 
     def move(self, url, newurl):
+        """
+        Updates the uri of the page in the database to newurl, provided newurl does not exist.
+        @param url: The url of the page to be moved
+        @param newurl: the destination url
+        @return:
+        """
         if (PageTable.select().where("", URI=newurl).exec()):
             msg = f'Cannot move page to url \'{newurl}\' as it already exists'
             log_wiki.error(msg)
@@ -341,12 +347,17 @@ class Wiki(object):
 
 
     def delete(self, url):
+        """
+        Deletes a page from the database. Currently, no way to delete a non-existing page.
+        But future may have a delete by name function
+        @param url: The url to be deleted
+        """
         log_wiki.info(f'Deleting page with url: \'{url}\'')
         if(PageTable.select().where("", URI=url).exec):
             PageTable.delete().where("", URI=url).exec()
             log_wiki.info('Page deleted.')
             return True
-        log_wiki.info("Page did not exist. Don't know how this happened.")
+        log_wiki.info("Page did not exist.")
         return False
 
 
