@@ -214,6 +214,12 @@ class Page(object):
         self._html, self.body, self._meta = processor.process()
 
     def save(self, update=True):
+        """
+        First checks if a page already exists in the DB, and if so, updates that page.
+        Otherwise creates a new page entry with this object.
+        @param update: True if the page should be rendered upon completion of the save.
+        @return:
+        """
         now = datetime.datetime.now()
         lines = []
         for key, value in list(self._meta.items()):
@@ -280,6 +286,11 @@ class Wiki(object):
         self.root = root
 
     def get_from_DB(self, url):
+        """
+        Gets a page from the database based on url
+        @param url: The url of the page
+        @return: A Page object
+        """
         result_list = PageTable.select().where("OR", URI=url).exec()
         if len(result_list) == 0:
             log_db.error(f'Unable to find page with url/title: \'{url}\'')
@@ -301,6 +312,11 @@ class Wiki(object):
         return os.path.join(self.root, url + '.md')
 
     def exists(self, url):
+        """
+        Checks whether or not a page exists by url
+        @param url: The url of the page in question
+        @return: True if the page exists in the DB
+        """
         result_list = PageTable.select().where('OR',URI=url,title=url).exec()
         return len(result_list) > 0
 
@@ -322,9 +338,15 @@ class Wiki(object):
         return None
 
     def get_bare(self, url):
+        """
+        Returns a 'blank' page object.
+        @param url: The url of the blank page object to be constructed.
+        @return: A page object
+        """
         if self.exists(url):
             return False
         id = len(PageTable.select().exec()) + 1
+        log_wiki.info(f'created page with ID= \'{id}\'')
         page = Page(id, url, "", "", "", "", new=True)
         return page
 
