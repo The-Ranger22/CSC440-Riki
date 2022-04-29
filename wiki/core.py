@@ -339,8 +339,6 @@ class Wiki(object):
             msg = f'Cannot move page to url \'{newurl}\' as it already exists'
             log_wiki.error(msg)
             raise ValueError(msg)
-        elif (url == 'home'):
-            raise ValueError('Cannot move the home page!')
         else:
             log_wiki.info(f'Moved page from url: \'{url}\' to url: \'{newurl}\'')
             PageTable.update(URI=newurl).where("", URI=url).exec()
