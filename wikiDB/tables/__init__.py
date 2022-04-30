@@ -11,14 +11,11 @@ from abc import ABC, abstractmethod
 # endregion
 log = logging.getLogger('database')
 
-
-
-
 def _query(method):
     """
-    A decorator responsible for connecting to a SQLite database and returning the query result (if any).
-    @param method: the query method to be decorated
-    @return: the query wrapper responsible for connecting to the database
+    A decorator responsible for connecting to a SQLite database and returning the tables result (if any).
+    @param method: the tables method to be decorated
+    @return: the tables wrapper responsible for connecting to the database
     """
     def query_wrap(ref):
         """
@@ -31,7 +28,7 @@ def _query(method):
         try:
             cursor = conn.cursor()
             query_format, arguments = method(ref)
-            log.debug(f'Attempting query: {query_format}')
+            log.debug(f'Attempting tables: {query_format}')
             cursor.execute("PRAGMA foreign_keys = ON;")
             cursor.execute(query_format, arguments)
             result = cursor.fetchall()
@@ -105,7 +102,7 @@ class AbstractTable(ABC):
 
             self._clauses.append(query_cmd)
 
-        def where(self, separator, **kwargs):
+        def where(self, separator='', **kwargs):
             if len(kwargs) == 0:
                 log.debug("'No conditions for the WHERE statement were provided'")
                 raise ValueError("No conditions for the WHERE statement were provided")
@@ -204,8 +201,6 @@ class UserTable(AbstractTable):
     def delete(cls):
         return cls.Query(cls.name(), "DELETE")
 # endregion
-
-
 
 # region Page Table
 class PageTable(AbstractTable):

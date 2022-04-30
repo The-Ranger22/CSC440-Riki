@@ -18,7 +18,7 @@ import markdown
 import datetime
 
 import config
-from wikiDB.query import PageTable
+from wikiDB.tables import PageTable
 log_wiki = logging.getLogger('wiki')
 log_db = logging.getLogger('database')
 

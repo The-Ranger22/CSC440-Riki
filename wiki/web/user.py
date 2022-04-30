@@ -11,7 +11,7 @@ from functools import wraps
 from flask import current_app
 from flask_login import current_user
 
-from wikiDB.query import UserTable
+from wikiDB.tables import UserTable
 
 
 class UserManager(object):
@@ -38,7 +38,7 @@ class UserManager(object):
         raw_query_data = UserTable.select().exec()
         data = {}
 
-        # Convert query data to the expected dictionary format
+        # Convert tables data to the expected dictionary format
         for uid, username, password, email, authenticated, active in raw_query_data:
             data[username] = {
                 'active': active,

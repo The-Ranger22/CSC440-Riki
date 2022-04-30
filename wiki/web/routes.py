@@ -151,7 +151,7 @@ def categories():
     #       print(tag.name)
     #       for (relationship in relationships){
     #           if tag.id = relationship[0]{
-    #               page = PageTable.query(PageID = relationship[1])
+    #               page = PageTable.tables(PageID = relationship[1])
     #               <a href=(page.url)>page.name</a>
     #           }
     #       }
