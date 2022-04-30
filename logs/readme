@@ -1,0 +1,15 @@
+- Debug: Information helpful for development/debugging, but is not necessary for
+		   day-to-day monitoring. E.g. method entry/exit, parameters, etc.
+- Info: Information about routine operation of the site, that may be useful
+        retrospectively. E.g. who edits a page when, a new user being created, etc.
+- Warn: Information about unusual but non-breaking or recoverable activity. E.g. an
+        input parsing error when a user inputs information
+- Error: Exceptions and errors that prevent the site from working correctly.
+           E.g. database retrieval errors.
+- Critical: Things that crash the site.
+
+Do not log sensitive information!
+
+Riki.log for general riki information, using logger 'wiki'
+Riki.DB.log for database info, using logger 'database'
+external.log used for libraries and other external stuff.

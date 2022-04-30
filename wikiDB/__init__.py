@@ -13,7 +13,7 @@ file_ext = ".db"
 def db_file_path():
     return getcwd() + "/" + db_name + file_ext
 
-def setup():
+def wiki_db_setup():
     loc = __path__[0]
     log.info("beginning db setup.")
     with open(f"{loc}/SQL/create_db.sql", "r") as file:
@@ -46,7 +46,7 @@ def setup():
 
 if __name__ == "__main__":
     if not exists(db_file_path()):
-        setup()
+        wiki_db_setup()
 
 
 

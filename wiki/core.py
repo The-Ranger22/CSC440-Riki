@@ -18,7 +18,7 @@ import markdown
 import datetime
 
 import config
-from wikiDB.query import PageTable
+from wikiDB.tables import PageTable
 log_wiki = logging.getLogger('wiki')
 log_db = logging.getLogger('database')
 
@@ -214,6 +214,12 @@ class Page(object):
         self._html, self.body, self._meta = processor.process()
 
     def save(self, update=True):
+        """
+        First checks if a page already exists in the DB, and if so, updates that page.
+        Otherwise creates a new page entry with this object.
+        @param update: True if the page should be rendered upon completion of the save.
+        @return:
+        """
         now = datetime.datetime.now()
         lines = []
         for key, value in list(self._meta.items()):
@@ -280,6 +286,11 @@ class Wiki(object):
         self.root = root
 
     def get_from_DB(self, url):
+        """
+        Gets a page from the database based on url
+        @param url: The url of the page
+        @return: A Page object
+        """
         result_list = PageTable.select().where("OR", URI=url).exec()
         if len(result_list) == 0:
             log_db.error(f'Unable to find page with url/title: \'{url}\'')
@@ -301,6 +312,11 @@ class Wiki(object):
         return os.path.join(self.root, url + '.md')
 
     def exists(self, url):
+        """
+        Checks whether or not a page exists by url
+        @param url: The url of the page in question
+        @return: True if the page exists in the DB
+        """
         result_list = PageTable.select().where('OR',URI=url,title=url).exec()
         return len(result_list) > 0
 
@@ -321,49 +337,47 @@ class Wiki(object):
             )
         return None
 
-    # def get_or_404(self, url):
-    #     page = self.get(url)
-    #     if page:
-    #         return page
-    #     log.error(f'Unable to find resource: \'{url}\'')
-    #     abort(404)
-
     def get_bare(self, url):
+        """
+        Returns a 'blank' page object.
+        @param url: The url of the blank page object to be constructed.
+        @return: A page object
+        """
         if self.exists(url):
             return False
         id = len(PageTable.select().exec()) + 1
+        log_wiki.info(f'created page with ID= \'{id}\'')
         page = Page(id, url, "", "", "", "", new=True)
         return page
 
     def move(self, url, newurl):
-        source = os.path.join(self.root, url) + '.md'
-        target = os.path.join(self.root, newurl) + '.md'
-        # normalize root path (just in case somebody defined it absolute,
-        # having some '../' inside) to correctly compare it to the target
-        root = os.path.normpath(self.root)
-        # get root path longest common prefix with normalized target path
-        common = os.path.commonprefix((root, os.path.normpath(target)))
-        # common prefix length must be at least as root length is
-        # otherwise there are probably some '..' links in target path leading
-        # us outside defined root directory
-        if len(common) < len(root):
-            log_wiki.critical(f'Possible write attempt outside content directory: \'{newurl}\'')
-            raise RuntimeError(
-                'Possible write attempt outside content directory: '
-                '%s' % newurl)
-        # create folder if it does not exists yet
-        folder = os.path.dirname(target)
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-        os.rename(source, target)
+        """
+        Updates the uri of the page in the database to newurl, provided newurl does not exist.
+        @param url: The url of the page to be moved
+        @param newurl: the destination url
+        @return:
+        """
+        if (PageTable.select().where("", URI=newurl).exec()):
+            msg = f'Cannot move page to url \'{newurl}\' as it already exists'
+            log_wiki.error(msg)
+            raise ValueError(msg)
+        else:
+            log_wiki.info(f'Moved page from url: \'{url}\' to url: \'{newurl}\'')
+            PageTable.update(URI=newurl).where("", URI=url).exec()
+
 
     def delete(self, url):
+        """
+        Deletes a page from the database. Currently, no way to delete a non-existing page.
+        But future may have a delete by name function
+        @param url: The url to be deleted
+        """
         log_wiki.info(f'Deleting page with url: \'{url}\'')
         if(PageTable.select().where("", URI=url).exec):
             PageTable.delete().where("", URI=url).exec()
             log_wiki.info('Page deleted.')
             return True
-        log_wiki.info("Page did not exist. Don't know how this happened.")
+        log_wiki.info("Page did not exist.")
         return False
 
 

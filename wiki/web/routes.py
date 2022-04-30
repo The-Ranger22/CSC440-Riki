@@ -93,10 +93,14 @@ def preview():
 @bp.route('/move/<path:url>/', methods=['GET', 'POST'])
 @protect
 def move(url):
-    page = current_wiki.get_or_404(url)
+    if(url=='home'):
+        flash('Can\'t move the home page!')
+        return display('home')
+    page = current_wiki.get_from_DB(url)
     form = URLForm(obj=page)
     if form.validate_on_submit():
         newurl = form.url.data
+        log.info(f'Moving page \'{url}\' to \'{newurl}\'')
         current_wiki.move(url, newurl)
         return redirect(url_for('wiki.display', url=newurl))
     return render_template('move.html', form=form, page=page)
@@ -149,7 +153,7 @@ def categories():
     #       print(tag.name)
     #       for (relationship in relationships){
     #           if tag.id = relationship[0]{
-    #               page = PageTable.query(PageID = relationship[1])
+    #               page = PageTable.tables(PageID = relationship[1])
     #               <a href=(page.url)>page.name</a>
     #           }
     #       }
