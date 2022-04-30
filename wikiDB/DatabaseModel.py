@@ -5,6 +5,9 @@ db = SQLAlchemy()
 
 
 class User(AbstractBaseModel):
+    """
+    Database model for User table in the database
+    """
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.Text, nullable=False)
     password = db.Column(db.Text, nullable=False)
@@ -17,7 +20,9 @@ class User(AbstractBaseModel):
 
 
 class Page(AbstractBaseModel):
-
+    """
+    Database model for Page table in the database
+    """
     id = db.Column(db.Integer, primary_key=True)
     uri = db.Column(db.Text, unique=True, nullable=False)
     title = db.Column(db.String(80), nullable=False)
@@ -38,6 +43,9 @@ class Page(AbstractBaseModel):
 
 
 class Category(AbstractBaseModel):
+    """
+    Database model for Category table in the database
+    """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
 
@@ -45,9 +53,24 @@ class Category(AbstractBaseModel):
         return '<Category %r>' % self.name
 
 
-class PageTags(AbstractBaseModel):
-    article_id = db.Column(db.Integer, db.ForeignKey('page.id'), primary_key=True)
+class Tags(AbstractBaseModel):
+    """
+    Database model for Tags table in the database
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text, nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), primary_key=True)
+
+    def __repr__(self):
+        return '<Tags %r>' % self.name
+
+
+class PageTags(AbstractBaseModel):
+    """
+    Database model for Page_Tags table in the database
+    """
+    article_id = db.Column(db.Integer, db.ForeignKey('page.id'), primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey('tag.id'), primary_key=True)
 
     def __repr__(self):
         return '<PageTags %r>' % self.article_id
