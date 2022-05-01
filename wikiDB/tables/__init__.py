@@ -14,8 +14,8 @@ log = logging.getLogger('database')
 def _query(method):
     """
     A decorator responsible for connecting to a SQLite database and returning the tables result (if any).
-    @param method: the tables method to be decorated
-    @return: the tables wrapper responsible for connecting to the database
+    @param method: the method to be decorated
+    @return: the wrapper responsible for connecting to the database
     """
     def query_wrap(ref):
         """
@@ -42,6 +42,11 @@ def _query(method):
     return query_wrap
 
 def _kwargs_sq_processor(kwargs):
+    """
+    Converts all values within a provided dictionary to string values
+    @param kwargs:
+    @return:
+    """
     if not isinstance(kwargs, dict):
         raise TypeError
 
@@ -64,6 +69,13 @@ class AbstractTable(ABC):
             return ["INSERT", "SELECT", "UPDATE", "DELETE"]
 
         def __init__(self, table, query_type, *args, **kwargs):
+            """
+            The Query class does all the SQL work you want without requiring you to write a single line of SQL. It models an SQL query.
+            @param table: name of the table to query
+            @param query_type: the type of query (supported queries: INSERT, SELECT, UPDATE, DELETE)
+            @param args:
+            @param kwargs:
+            """
             # ensuring type correctness
             if not isinstance(query_type, str):
                 raise TypeError
@@ -71,8 +83,6 @@ class AbstractTable(ABC):
                 raise TypeError
 
             query_type = query_type.upper()
-            # kwargs = _kwargs_sq_processor(kwargs)  # Applying single quotes to all values of type str
-
 
             if query_type not in self.query_types:
                 log.error()
@@ -86,7 +96,6 @@ class AbstractTable(ABC):
                     log.debug("'No fields for the INSERT statement were provided'")
                     raise ValueError
                 seperator = ", "
-                # query_cmd = f"INSERT INTO {table} ({seperator.join(kwargs.keys())}) VALUES ({seperator.join(kwargs.values())})"
                 query_cmd = f"INSERT INTO {table} ({seperator.join(kwargs.keys())}) VALUES ({seperator.join(['?' for x in range(len(kwargs.values()))])})"
                 self._args = list(kwargs.values())
             elif query_type == "SELECT":
@@ -102,7 +111,13 @@ class AbstractTable(ABC):
 
             self._clauses.append(query_cmd)
 
-        def where(self, separator='', **kwargs):
+        def where(self, separator='OR', **kwargs):
+            """
+            Appends a where clause to the query
+            @param separator: used for where statements with more than one condition. Defaults to OR
+            @param kwargs: the conditions for the where clause
+            @return:
+            """
             if len(kwargs) == 0:
                 log.debug("'No conditions for the WHERE statement were provided'")
                 raise ValueError("No conditions for the WHERE statement were provided")
@@ -112,12 +127,21 @@ class AbstractTable(ABC):
             return self
 
         def group_by(self, *cols):
+            """
+            Appends a GROUP BY clause to the query
+            @param cols: A string, or a list of strings, corresponding to the column names of a table
+            @return:
+            """
             separator = ", "
             self._clauses.append(f"GROUP BY {separator.join(cols)}")
             return self
 
         @_query
         def exec(self):
+            """
+            Assembles the final query and executes it
+            @return:
+            """
             log.debug(self._clauses)
             log.debug(self._args)
             return (f"{' '.join(self._clauses)};", self._args)
